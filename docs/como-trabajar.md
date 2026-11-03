@@ -50,6 +50,53 @@ Cuando termines el cambio, usa la tarjeta `tarjetas/cierre.md`. Te ayuda a revis
 - La sección "Uso de IA" tiene las dos líneas.
 - No subiste video, audio ni llaves.
 
+<a id="guion-y-shotlist"></a>
+## Guion y shotlist
+
+El guion vive en `02_guion/guion.md` y el shotlist en `03_shotlist/shotlist.yaml`. Los dos son texto y los escribes tú; la receta `/lca425:guion-a-shotlist` (o su tarjeta) solo te ayuda a ordenarlos y te hace preguntas.
+
+**Guion.** Cada escena empieza con un encabezado de nivel 2, con este formato:
+
+```
+## ESC 1 · EXT. PARADA DE AUTOBÚS · AMANECER
+Acción en presente, en párrafos cortos.
+NOMBRE: diálogo, si lo hay.
+```
+
+- `ESC`, un número, `INT.`, `EXT.` o `INT./EXT.`, el lugar y el momento, separados por el punto medio `·`.
+- Los números van en orden, desde 1, sin saltos ni repetidos.
+- El gate solo revisa esta forma. Si el guion es bueno lo ve el reto en frío y Daria.
+
+**Shotlist.** Cada plano lleva, además de sus campos de siempre:
+
+- `escena`: el número de una escena que existe en tu guion (obligatorio cuando ya hay `guion.md`).
+- `proposito`: una frase sobre para qué sirve ese plano respecto de `que_debe_lograr` de tu brief (siempre obligatorio).
+
+<a id="reto-en-frio"></a>
+## Reto en frío: cómo responder los hallazgos
+
+El reto en frío es pedirle a **otro modelo** (distinto del que te ayudó a escribir) que intente romper tu brief, tu guion y tu shotlist. Lo haces antes de una entrega de nivel **Revisión**; en ese nivel, el gate exige que el PR tenga la sección `## Reto en frío`.
+
+1. Corre `/lca425:reto-en-frio` en Claude Code, o pega la tarjeta `tarjetas/reto-en-frio.md` en un chat nuevo de otro modelo.
+2. Recibes una lista de hallazgos numerados (H1, H2, ...), cada uno con su evidencia (archivo y escena o plano).
+3. **Tú decides cada uno**, de a uno:
+   - **Lo incorporas:** cambias tu guion o tu shotlist y dices qué cambiaste.
+   - **Lo rechazas:** escribes tu razón con tus palabras. Rechazar es válido si tienes una razón.
+4. Pegas el resultado en el PR, un hallazgo por línea, con este formato exacto:
+
+```
+## Reto en frío
+
+- H1: <hallazgo> → Incorporo: <qué cambiaste>
+- H2: <hallazgo> → Rechazo: <tu razón>
+```
+
+Lo que revisa el gate: que haya al menos un hallazgo con su respuesta y que después de `Incorporo:` o `Rechazo:` haya texto. No juzga si tu razón es buena; eso lo ve Daria al revisar.
+
+Lo que no hace el reto: no revisa los clips (solo texto) y no cambia tus archivos. Si decides incorporar algo, el cambio lo haces tú o se lo pides aparte a Claude.
+
+Si el PR no es de nivel Revisión, la sección puede quedar vacía o decir `No aplica`.
+
 <a id="binario-subido"></a>
 ## Si subiste un video o un binario
 

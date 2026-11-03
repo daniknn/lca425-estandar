@@ -244,6 +244,141 @@ class TestPR(Base):
         self.assertFalla(self.correr(pr_body=cuerpo), "pr-personas-reales")
 
 
+class TestGuion(Base):
+    def test_sano_con_guion_pasa(self):
+        self.assertTrue((self.repo / "02_guion" / "guion.md").is_file())
+        self.assertEqual(self.correr().fallas, [])
+
+    def test_encabezado_con_formato_malo(self):
+        self.superponer("guion-formato")
+        res = self.correr()
+        self.assertFalla(res, "guion-formato")
+        f = next(f for f in res.fallas if f["regla"] == "guion-formato")
+        self.assertIn("línea 4", f["que_paso"])
+        self.assertIn("#guion-y-shotlist", f["por_que"])
+
+    def test_guion_sin_ningun_encabezado(self):
+        self.escribir("02_guion/guion.md", "El autobús va vacío al amanecer.\n")
+        self.assertFalla(self.correr(), "guion-formato")
+
+    def test_encabezado_dentro_de_bloque_de_codigo_se_ignora(self):
+        guion = self.repo / "02_guion" / "guion.md"
+        guion.write_text(guion.read_text(encoding="utf-8") + "\n```\n## cualquier cosa\n```\n", encoding="utf-8")
+        self.assertEqual(self.correr().fallas, [])
+
+    def test_escena_repetida(self):
+        self.superponer("guion-repetido")
+        self.assertFalla(self.correr(), "guion-escena-repetida")
+
+    def test_escena_con_salto(self):
+        self.superponer("guion-salto")
+        self.assertFalla(self.correr(), "guion-escena-salto")
+
+    def test_escena_que_no_empieza_en_1(self):
+        guion = self.repo / "02_guion" / "guion.md"
+        texto = guion.read_text(encoding="utf-8").replace("ESC 1", "ESC 0").replace("ESC 2", "ESC 1")
+        guion.write_text(texto, encoding="utf-8")
+        self.assertFalla(self.correr(), "guion-escena-salto")
+
+    def test_guion_vacio_cuenta_como_sin_guion(self):
+        self.escribir("02_guion/guion.md", "\n")
+        ruta = self.repo / "03_shotlist" / "shotlist.yaml"
+        ruta.write_text(ruta.read_text(encoding="utf-8").replace("    escena: 1\n", "").replace("    escena: 2\n", ""), encoding="utf-8")
+        self.assertEqual(self.correr().fallas, [])
+
+    def test_sin_guion_no_exige_escena(self):
+        (self.repo / "02_guion" / "guion.md").unlink()
+        ruta = self.repo / "03_shotlist" / "shotlist.yaml"
+        ruta.write_text(ruta.read_text(encoding="utf-8").replace("    escena: 1\n", "").replace("    escena: 2\n", ""), encoding="utf-8")
+        self.assertEqual(self.correr().fallas, [])
+
+
+class TestShotlistClase13(Base):
+    def test_sin_proposito(self):
+        self.superponer("shotlist-sin-proposito")
+        res = self.correr()
+        self.assertFalla(res, "shotlist-proposito")
+        f = next(f for f in res.fallas if f["regla"] == "shotlist-proposito")
+        self.assertIn("P01", f["que_paso"])
+        self.assertIn("P02", f["que_paso"])
+
+    def test_proposito_vacio_o_placeholder(self):
+        ruta = self.repo / "03_shotlist" / "shotlist.yaml"
+        texto = ruta.read_text(encoding="utf-8")
+        ruta.write_text(texto.replace(
+            "proposito: Establece el autobús vacío y la luz del amanecer, que es lo que el brief quiere que se recuerde.",
+            "proposito: TODO"), encoding="utf-8")
+        res = self.correr()
+        self.assertFalla(res, "shotlist-proposito")
+        f = next(f for f in res.fallas if f["regla"] == "shotlist-proposito")
+        self.assertIn("P01", f["que_paso"])
+        self.assertNotIn("P02", f["que_paso"])
+
+    def test_proposito_se_exige_aunque_no_haya_guion(self):
+        (self.repo / "02_guion" / "guion.md").unlink()
+        self.superponer("shotlist-sin-proposito")
+        self.assertFalla(self.correr(), "shotlist-proposito")
+
+    def test_escena_falta_cuando_hay_guion(self):
+        ruta = self.repo / "03_shotlist" / "shotlist.yaml"
+        ruta.write_text(ruta.read_text(encoding="utf-8").replace("    escena: 2\n", ""), encoding="utf-8")
+        res = self.correr()
+        self.assertFalla(res, "shotlist-escena-falta")
+        f = next(f for f in res.fallas if f["regla"] == "shotlist-escena-falta")
+        self.assertIn("P02", f["que_paso"])
+        self.assertNotIn("P01", f["que_paso"])
+
+    def test_escena_inexistente(self):
+        self.superponer("shotlist-escena-inexistente")
+        res = self.correr()
+        self.assertFalla(res, "shotlist-escena-inexistente")
+        f = next(f for f in res.fallas if f["regla"] == "shotlist-escena-inexistente")
+        self.assertIn("escena 7", f["que_paso"])
+
+    def test_escena_como_texto_con_digitos_se_acepta(self):
+        ruta = self.repo / "03_shotlist" / "shotlist.yaml"
+        ruta.write_text(ruta.read_text(encoding="utf-8").replace("escena: 1", 'escena: "1"'), encoding="utf-8")
+        self.assertEqual(self.correr().fallas, [])
+
+
+class TestRetoEnFrio(Base):
+    def test_revision_con_reto_pasa(self):
+        self.assertEqual(self.correr(pr_body=leer("revision-con-reto.md")).fallas, [])
+
+    def test_revision_sin_seccion(self):
+        res = self.correr(pr_body=leer("revision-sin-reto.md"))
+        self.assertFalla(res, "pr-reto-en-frio")
+        f = next(f for f in res.fallas if f["regla"] == "pr-reto-en-frio")
+        self.assertIn("le falta la sección", f["que_paso"])
+        self.assertIn("#reto-en-frio", f["por_que"])
+
+    def test_revision_con_no_aplica(self):
+        self.assertFalla(self.correr(pr_body=leer("revision-reto-vacio.md")), "pr-reto-en-frio")
+
+    def test_revision_con_respuesta_sin_texto(self):
+        self.assertFalla(self.correr(pr_body=leer("revision-reto-sin-texto.md")), "pr-reto-en-frio")
+
+    def test_rechazo_sin_razon(self):
+        cuerpo = leer("revision-sin-reto.md") + "\n## Reto en frío\n\n- H1: Falta una escena. → Rechazo:   \n"
+        self.assertFalla(self.correr(pr_body=cuerpo), "pr-reto-en-frio")
+
+    def test_flecha_ascii_se_acepta(self):
+        cuerpo = leer("revision-sin-reto.md") + "\n## Reto en frío\n\n- H1: Falta una escena. -> Rechazo: ya está cubierta.\n"
+        self.assertEqual(self.correr(pr_body=cuerpo).fallas, [])
+
+    def test_aviso_sin_reto_pasa(self):
+        self.assertEqual(self.correr(pr_body=leer("aviso-sin-reto.md")).fallas, [])
+
+    def test_aviso_con_no_aplica_pasa(self):
+        cuerpo = leer("aviso-sin-reto.md") + "\n## Reto en frío\n\nNo aplica\n"
+        self.assertEqual(self.correr(pr_body=cuerpo).fallas, [])
+
+    def test_comentario_de_plantilla_no_cuenta_como_hallazgo(self):
+        cuerpo = leer("revision-sin-reto.md") + (
+            "\n## Reto en frío\n\n<!-- - H1: ejemplo → Incorporo: ejemplo -->\n")
+        self.assertFalla(self.correr(pr_body=cuerpo), "pr-reto-en-frio")
+
+
 class TestCLI(Base):
     def cli(self, *args):
         return subprocess.run([sys.executable, str(VALIDAR)] + [str(a) for a in args],
@@ -274,6 +409,13 @@ class TestCLI(Base):
         p = self.cli(self.repo, "--pr-body", FIXTURES / "pr" / "dos-niveles.md", "--json")
         self.assertEqual(p.returncode, 1)
         self.assertEqual(json.loads(p.stdout)["fallas"][0]["regla"], "pr-nivel")
+
+    def test_cli_mensaje_4_partes_en_reto_en_frio(self):
+        p = self.cli(self.repo, "--pr-body", FIXTURES / "pr" / "revision-sin-reto.md")
+        self.assertEqual(p.returncode, 1)
+        for parte in ("✋ Qué pasó:", "Por qué:", "Qué puedes hacer:", "Cómo destrabar:"):
+            self.assertIn(parte, p.stdout)
+        self.assertIn("https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#reto-en-frio", p.stdout)
 
     def test_carpeta_inexistente(self):
         self.assertEqual(self.cli(self.repo / "nada").returncode, 2)

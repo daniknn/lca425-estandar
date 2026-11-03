@@ -49,6 +49,9 @@ RE_ISSUE = re.compile(r"^#\d+$")
 RE_ID_PLANO = re.compile(r"^P\d{2}$")
 RE_ID_SEGURO = re.compile(r"^[A-Za-z0-9_-]+$")
 RE_DAS = re.compile(r"\bDAS-\d+\b")
+RE_ESCENA = re.compile(r"^##\s+ESC\s+(\d+)\s+·\s+(INT\./EXT\.|INT\.|EXT\.)\s+(.+?)\s+·\s+(\S.*?)\s*$")
+RE_HALLAZGO = re.compile(
+    r"^\s*[-*]\s*H(\d+)\s*:\s*(.+?)\s*(?:→|->)\s*(Incorporo|Rechazo)\s*:\s*(.*?)\s*$")
 
 
 # ---------------------------------------------------------------- resultado
@@ -347,13 +350,92 @@ def revisar_brief(repo, modo, res):
     return datos
 
 
+# ---------------------------------------------------------------- guion
+
+GUION_REL = "02_guion/guion.md"
+EJEMPLO_ESCENA = "## ESC 1 · EXT. PARADA DE AUTOBÚS · AMANECER"
+
+
+def revisar_guion(repo, res):
+    """Revisa la forma de 02_guion/guion.md. Devuelve el set de números de escena válidos,
+    o None si no hay guion (archivo ausente o vacío)."""
+    ruta = repo / GUION_REL
+    if not ruta.is_file():
+        return None
+    texto = leer_texto(ruta)
+    if texto is None or not texto.strip():
+        return None
+
+    malas = []
+    numeros = []
+    en_codigo = False
+    for n, linea in enumerate(texto.splitlines(), 1):
+        if linea.lstrip().startswith("```"):
+            en_codigo = not en_codigo
+            continue
+        if en_codigo or not re.match(r"^##(\s|$)", linea):
+            continue
+        m = RE_ESCENA.match(linea)
+        if m and not es_placeholder(m.group(3)) and not es_placeholder(m.group(4)):
+            numeros.append((int(m.group(1)), n))
+        else:
+            malas.append(n)
+
+    link_guion = link("como-trabajar.md", "guion-y-shotlist")
+    if malas or not numeros:
+        if malas:
+            que = "En %s estos encabezados no siguen el formato de escena (línea %s)." % (
+                GUION_REL, ", ".join(str(x) for x in malas[:5]))
+        else:
+            que = "En %s no encontré ninguna escena: cada escena empieza con un encabezado `## ESC N · ...`." % GUION_REL
+        res.falla(
+            "guion-formato", GUION_REL, que,
+            "Guion · el shotlist y el reto en frío se apoyan en los números de escena · " + link_guion,
+            ["Escribe cada encabezado así: %s" % EJEMPLO_ESCENA,
+             "Corre /lca425:guion-a-shotlist en Claude Code: ordena tus escenas con este formato y el texto sigue siendo tuyo.",
+             "Compara con 02_guion/guion.md de proyecto-ejemplo."],
+            "Corrige los encabezados (ESC, número, INT./EXT./INT./EXT., lugar y momento separados por ·) y sube el cambio.",
+            area="guion",
+        )
+
+    vistos = set()
+    repetidos = []
+    for num, _ in numeros:
+        if num in vistos and num not in repetidos:
+            repetidos.append(num)
+        vistos.add(num)
+    if repetidos:
+        res.falla(
+            "guion-escena-repetida", GUION_REL,
+            "El número de escena %s aparece más de una vez en %s." % (
+                ", ".join(str(x) for x in repetidos), GUION_REL),
+            "Guion · si dos escenas comparten número, no se sabe a cuál pertenece cada plano · " + link_guion,
+            ["Renumera las escenas en orden: 1, 2, 3...",
+             "Si es la misma escena, junta su texto bajo un solo encabezado."],
+            "Dale a cada escena su propio número y sube el cambio.",
+            area="guion",
+        )
+    elif [num for num, _ in numeros] != list(range(1, len(numeros) + 1)):
+        res.falla(
+            "guion-escena-salto", GUION_REL,
+            "Los números de escena de %s deben ir en orden, sin saltos y desde 1; encontré: %s." % (
+                GUION_REL, ", ".join(str(num) for num, _ in numeros)),
+            "Guion · los números consecutivos permiten ubicar cada plano en la historia · " + link_guion,
+            ["Renumera las escenas: 1, 2, 3... en el orden en que aparecen.",
+             "Si quitaste una escena, recorre los números de las que siguen (y la `escena` de sus planos)."],
+            "Renumera los encabezados y sube el cambio.",
+            area="guion",
+        )
+    return set(num for num, _ in numeros)
+
+
 # ---------------------------------------------------------------- shotlist y prompts
 
 def orden_estado(estado):
     return ESTADOS.index(estado) if estado in ESTADOS else -1
 
 
-def revisar_shotlist(repo, brief, res, yamlc):
+def revisar_shotlist(repo, brief, res, yamlc, escenas=None):
     rel = "03_shotlist/shotlist.yaml"
     ruta = repo / rel
     if not ruta.is_file():
@@ -381,6 +463,9 @@ def revisar_shotlist(repo, brief, res, yamlc):
 
     vistos = set()
     hay_idea = False
+    sin_proposito = []
+    sin_escena = []
+    escena_inexistente = []
     for i, p in enumerate(planos, 1):
         if not isinstance(p, dict):
             res.falla(
@@ -433,6 +518,17 @@ def revisar_shotlist(repo, brief, res, yamlc):
                 "Completa el plano y sube el cambio.",
                 area="shotlist",
             )
+
+        if not es_texto_util(p.get("proposito")):
+            sin_proposito.append(etiqueta)
+        if escenas is not None:
+            esc = p.get("escena")
+            if isinstance(esc, str) and re.fullmatch(r"\d+", esc.strip()):
+                esc = int(esc.strip())
+            if isinstance(esc, bool) or not isinstance(esc, int):
+                sin_escena.append(etiqueta)
+            elif escenas and esc not in escenas:
+                escena_inexistente.append("%s (escena %d)" % (etiqueta, esc))
 
         est = p.get("estado")
         if est not in ESTADOS:
@@ -515,6 +611,42 @@ def revisar_shotlist(repo, brief, res, yamlc):
                     "Abre un issue de permiso; la receta /lca425:cierre te lo redacta.",
                     area="shotlist",
                 )
+
+    link_sl = link("como-trabajar.md", "guion-y-shotlist")
+    if sin_proposito:
+        res.falla(
+            "shotlist-proposito", rel,
+            "Estos planos no tienen `proposito`: %s." % ", ".join(sin_proposito),
+            "Shotlist · cada plano debe servir a lo que tu pieza quiere lograr (que_debe_lograr del brief); "
+            "sin propósito no se sabe si el plano hace falta · " + link_sl,
+            ["Escribe en `proposito` una frase: qué aporta ese plano para lograr lo que dice tu brief.",
+             "Si no sabes para qué sirve un plano, es buena señal para quitarlo.",
+             "Corre /lca425:guion-a-shotlist en Claude Code: te pregunta el propósito de cada plano."],
+            "Agrega `proposito` a cada plano de la lista y sube el cambio.",
+            area="shotlist",
+        )
+    if sin_escena:
+        res.falla(
+            "shotlist-escena-falta", rel,
+            "Como ya tienes 02_guion/guion.md, estos planos necesitan `escena` (el número de la escena a la que pertenecen): %s." % (
+                ", ".join(sin_escena)),
+            "Shotlist · cada plano nace de una escena del guion; así se ve qué parte de la historia queda sin cubrir · " + link_sl,
+            ["Escribe `escena: N` con el número de una escena de tu guion (por ejemplo `escena: 1`).",
+             "Corre /lca425:guion-a-shotlist en Claude Code para asignarlas contigo."],
+            "Agrega `escena` a esos planos y sube el cambio.",
+            area="shotlist",
+        )
+    if escena_inexistente:
+        res.falla(
+            "shotlist-escena-inexistente", rel,
+            "Estos planos apuntan a una escena que no existe en 02_guion/guion.md: %s. Escenas que sí existen: %s." % (
+                ", ".join(escena_inexistente), ", ".join(str(x) for x in sorted(escenas))),
+            "Shotlist · un plano sin escena real queda suelto de la historia · " + link_sl,
+            ["Corrige `escena` para que sea una de las que existen.",
+             "Si el plano es de una escena nueva, agrégala primero al guion con su encabezado `## ESC N · ...`."],
+            "Haz que cada `escena` coincida con un encabezado del guion y sube el cambio.",
+            area="shotlist",
+        )
 
     if res.hay_falla("shotlist") or hay_idea:
         res.areas["shotlist"] = "borrador"
@@ -785,6 +917,8 @@ def revisar_pr(cuerpo, res):
             "Edita la descripción del PR, agrega la sección y se vuelve a revisar sola.",
         )
 
+    nivel_marcado = None
+
     # Nivel
     sec = secs.get("nivel")
     if sec is None:
@@ -797,6 +931,8 @@ def revisar_pr(cuerpo, res):
             for nivel in ("libre", "aviso", "revision", "permiso"):
                 if palabra.startswith(nivel) and marcada:
                     marcadas.append(nivel)
+        if len(marcadas) == 1:
+            nivel_marcado = marcadas[0]
         if len(marcadas) != 1:
             que = ("Hay %d niveles marcados en `## Nivel` y debe haber exactamente uno." % len(marcadas)
                    if marcadas else "No hay ningún nivel marcado en `## Nivel`.")
@@ -807,6 +943,28 @@ def revisar_pr(cuerpo, res):
                  "Si dudas entre dos, elige el más alto de los dos.",
                  "Si crees que es Permiso, pídeselo a Daria en un issue antes de seguir."],
                 "Edita la descripción del PR para dejar una sola casilla marcada.",
+            )
+
+    # Reto en frío (solo nivel Revisión)
+    if nivel_marcado == "revision":
+        hallazgos = []
+        for linea in (secs.get("reto en frio") or "").splitlines():
+            m = RE_HALLAZGO.match(linea)
+            if m and not es_placeholder(m.group(2)) and not es_placeholder(m.group(4)):
+                hallazgos.append(m.group(1))
+        if not hallazgos:
+            falta = "reto en frio" not in secs
+            res.falla(
+                "pr-reto-en-frio", archivo,
+                ("Al PR de nivel Revisión le falta la sección `## Reto en frío`."
+                 if falta else
+                 "La sección `## Reto en frío` no tiene ningún hallazgo con su respuesta (`→ Incorporo:` o `→ Rechazo:` y un texto)."),
+                "Reto en frío · quien escribió el material es el peor revisor de sí mismo; otro modelo busca los huecos "
+                "y tú decides cada uno · " + link("como-trabajar.md", "reto-en-frio"),
+                ["Corre /lca425:reto-en-frio en Claude Code, o usa la tarjeta `reto-en-frio` en claude.ai, y pega el bloque que te devuelve.",
+                 "Escribe cada hallazgo en una línea: `- H1: <hallazgo> → Incorporo: <qué cambiaste>` o `- H1: <hallazgo> → Rechazo: <tu razón>`.",
+                 "Si no sabes cómo responder un hallazgo, pregúntale a Daria en clase."],
+                "Pega la sección `## Reto en frío` con al menos un hallazgo respondido en la descripción del PR; el gate se vuelve a correr solo.",
             )
 
     # Qué cambia
@@ -901,7 +1059,8 @@ def ejecutar(repo_path, modo="alumno", pr_body=None, solo_palabras=False):
     yamlc = CargadorYaml(res)
     revisar_requeridos(repo, res)
     brief = revisar_brief(repo, modo, res)
-    revisar_shotlist(repo, brief, res, yamlc)
+    escenas = revisar_guion(repo, res)
+    revisar_shotlist(repo, brief, res, yamlc, escenas)
     revisar_prompts(repo, res, yamlc)
     revisar_media(repo, res)
     revisar_palabras(repo, res)
