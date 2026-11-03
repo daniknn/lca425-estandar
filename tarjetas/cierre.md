@@ -2,7 +2,7 @@
 
 ## Para qué
 
-Antes de pedirle a Daria que revise tu PR, haz este cierre. Sirve para comprobar que tu PR esté completo y sea honesto: nivel marcado, "Hizo la IA" y "Hice yo" escritos, personas reales revisadas, créditos dentro del tope y un plan de pruebas para quien revisa. Pegas tu `00_brief.md` y el texto actual de tu PR en un chat de claude.ai y te devuelve el PR corregido para que lo pegues tú en GitHub. Es lo mismo que hace `/lca425:cierre` en Claude Code, pero el gate de GitHub sigue siendo el que cuenta: la IA no puede ver si está en verde, tú sí.
+Antes de pedirle a Daria que revise tu PR, haz este cierre. Sirve para comprobar que tu PR esté completo y sea honesto: nivel marcado, "Hizo la IA" y "Hice yo" escritos, créditos dentro del tope y un plan de pruebas para quien revisa. Pegas tu `00_brief.md` y el texto actual de tu PR en un chat de claude.ai y te devuelve el PR corregido para que lo pegues tú en GitHub. Es lo mismo que hace `/lca425:cierre` en Claude Code, pero el gate de GitHub sigue siendo el que cuenta: la IA no puede ver si está en verde, tú sí.
 
 ## Pasos en GitHub web
 
@@ -32,9 +32,9 @@ Cuando las tengas, haz estos pasos:
 2. Plan de pruebas: en máximo 5 líneas, qué debería mirar Daria al revisar y qué comprobar a mano.
 3. Confianza: una cifra del 1 al 10 con una línea de razón. Solo vale junto al resultado del gate; si el gate está en rojo o no me lo has visto, no pases de 6.
 4. Hice yo / Hizo la IA: pregúntame "¿Qué hiciste tú en este trabajo? Dímelo con tus palabras." Escribe mi respuesta tal cual en "Hice yo:". En "Hizo la IA:" resume de forma honesta lo que la IA hizo según lo que me cuentes. Nunca llenes "Hice yo:" por tu cuenta.
-5. Personas reales: revisa mi brief. Si aparece la cara o la voz de una persona real identificable (incluida una parodia) o un menor y no hay issue_permiso con #N, dime que es nivel Permiso y no sigas con la entrega: redáctame el borrador del issue con "[Permiso]" en el título y estos puntos: qué quiero hacer, por qué, qué toca, riesgo, cómo lo reviertes.
-6. Créditos: pregúntame cuántos créditos gasté y compáralo con presupuesto_creditos del brief. Si me pasé, también es Permiso.
-7. Nivel: dime cuál aplica y por qué: Libre (notas, prompts de prueba), Aviso (borradores, clips de prueba), Revisión (entregas evaluadas, material de terceros, publicar en mi portafolio) o Permiso (personas reales, menores, temas sensibles, pasarme del tope de créditos, publicar fuera del aula). Si dudo, el más alto.
+5. Tema sensible y publicación: pregúntame si el tema de mi pieza es sensible o si la voy a publicar fuera del aula. Si sí a cualquiera, dime que es nivel Permiso y no sigas con la entrega: redáctame el borrador del issue con "[Permiso]" en el título y estos puntos: qué quiero hacer, por qué, qué toca, riesgo, cómo lo reviertes.
+6. Créditos: pregúntame cuántos créditos gasté y compáralo con presupuesto_creditos del brief. Si me pasé, también es Permiso: redáctame el borrador del issue.
+7. Nivel: dime cuál aplica y por qué: Libre (notas, prompts de prueba), Aviso (borradores, clips de prueba), Revisión (entregas evaluadas, material de terceros, publicar en mi portafolio) o Permiso (temas sensibles, pasarme del tope de créditos, publicar fuera del aula). Si dudo, el más alto.
 
 Al final, devuélveme el texto completo de la descripción del PR, listo para pegar, con exactamente estas secciones:
 
@@ -47,9 +47,6 @@ Al final, devuélveme el texto completo de la descripción del PR, listo para pe
 ## Uso de IA
 Hizo la IA: ...
 Hice yo: ...
-
-## Personas reales
-(No marcado, o Sí marcado con #N)
 
 Termina con una sola pregunta: "¿Lo revisas tú con Daria o seguimos con el siguiente paso?"
 

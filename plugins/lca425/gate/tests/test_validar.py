@@ -95,15 +95,23 @@ class TestBrief(Base):
         self.superponer("formato-invalido")
         self.assertFalla(self.correr(modo="plantilla"), "brief-formato")
 
-    def test_personas_reales_sin_issue(self):
-        self.superponer("personas-sin-issue")
-        self.assertFalla(self.correr(), "personas-reales-sin-issue")
+    def test_brief_sin_campos_de_personas_pasa(self):
+        self.assertNotIn("personas_reales", (self.repo / "00_brief.md").read_text(encoding="utf-8"))
+        self.assertEqual(self.correr().fallas, [])
 
-    def test_personas_reales_con_issue_pasa(self):
-        self.superponer("personas-sin-issue")
+    def test_campos_retirados_del_brief_se_ignoran(self):
         brief = self.repo / "00_brief.md"
         texto = brief.read_text(encoding="utf-8").replace(
-            "personas_reales: si\n", "personas_reales: si\nissue_permiso: #4\n")
+            "drive:", "personas_reales: si\nissue_permiso: pendiente\ndrive:")
+        brief.write_text(texto, encoding="utf-8")
+        res = self.correr()
+        self.assertEqual(res.fallas, [])
+        self.assertEqual(res.avisos, [])
+
+    def test_campos_retirados_con_valores_raros_se_ignoran(self):
+        brief = self.repo / "00_brief.md"
+        texto = brief.read_text(encoding="utf-8").replace(
+            "drive:", "personas_reales: quizá\ndrive:")
         brief.write_text(texto, encoding="utf-8")
         self.assertEqual(self.correr().fallas, [])
 
@@ -143,11 +151,15 @@ class TestShotlistYPrompts(Base):
         (self.repo / "04_prompts" / "P02-v1.yaml").unlink()
         self.assertFalla(self.correr(), "shotlist-prompt-inexistente")
 
-    def test_persona_real_en_plano_exige_permiso(self):
+    def test_persona_real_en_plano_se_ignora(self):
         ruta = self.repo / "03_shotlist" / "shotlist.yaml"
-        ruta.write_text(ruta.read_text(encoding="utf-8").replace(
-            "persona_real: no", "persona_real: si", 1), encoding="utf-8")
-        self.assertFalla(self.correr(), "persona-real-sin-permiso")
+        texto = ruta.read_text(encoding="utf-8").replace(
+            "estado: validado\n", "estado: validado\n    persona_real: si\n", 1)
+        self.assertIn("persona_real: si", texto)
+        ruta.write_text(texto, encoding="utf-8")
+        res = self.correr()
+        self.assertEqual(res.fallas, [])
+        self.assertEqual(res.avisos, [])
 
     def test_id_repetido(self):
         ruta = self.repo / "03_shotlist" / "shotlist.yaml"
@@ -230,18 +242,15 @@ class TestPR(Base):
         cuerpo = leer("bueno.md").replace("Agregué el brief y el primer plano del shotlist.", "")
         self.assertFalla(self.correr(pr_body=cuerpo), "pr-que-cambia")
 
-    def test_personas_si_sin_numero(self):
-        cuerpo = leer("bueno.md").replace("- [x] No", "- [ ] No").replace("- [ ] Sí", "- [x] Sí")
-        self.assertFalla(self.correr(pr_body=cuerpo), "pr-personas-reales")
+    def test_seccion_personas_reales_se_ignora(self):
+        cuerpo = leer("bueno.md") + "\n## Personas reales\n\n- [ ] No\n- [x] Sí, issue de permiso: #N\n"
+        res = self.correr(pr_body=cuerpo)
+        self.assertEqual(res.fallas, [])
+        self.assertEqual(res.avisos, [])
 
-    def test_personas_si_con_numero(self):
-        cuerpo = leer("bueno.md").replace("- [x] No", "- [ ] No").replace(
-            "- [ ] Sí, issue de permiso: #N", "- [x] Sí, issue de permiso: #7")
-        self.assertEqual(self.correr(pr_body=cuerpo).fallas, [])
-
-    def test_falta_seccion(self):
-        cuerpo = leer("bueno.md").split("## Personas reales")[0]
-        self.assertFalla(self.correr(pr_body=cuerpo), "pr-personas-reales")
+    def test_pr_sin_seccion_personas_reales_pasa(self):
+        self.assertNotIn("Personas reales", leer("bueno.md"))
+        self.assertEqual(self.correr(pr_body=leer("bueno.md")).fallas, [])
 
 
 class TestGuion(Base):

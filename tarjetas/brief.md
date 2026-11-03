@@ -12,9 +12,9 @@ Esta tarjeta te ayuda a convertir tu idea en el `00_brief.md` de tu proyecto sin
 4. En GitHub, abre tu repo y entra a `00_brief.md`. Pulsa el lápiz (Edit) y reemplaza todo con el texto copiado.
 5. Al guardar, elige "Create a new branch for this commit" y ponle un nombre corto, como `brief`. Nunca elijas "commit directly to main".
 6. Pulsa "Propose changes" y luego "Create pull request".
-7. Llena el PR: Nivel (Aviso), Qué cambia, Uso de IA y Personas reales. En "Hice yo:" escribe tú lo que hiciste, con tus palabras.
+7. Llena el PR: Nivel (Aviso), Qué cambia y Uso de IA. En "Hice yo:" escribe tú lo que hiciste, con tus palabras.
 8. Espera la marca verde del gate. Si falla, abre "Details", lee el mensaje y corrige en la misma rama.
-9. Si en tu brief hay una persona real (cara o voz de alguien identificable, parodia incluida) o un menor, antes de seguir abre un issue de Permiso: [niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#permiso).
+9. Si el tema de tu brief es sensible, antes de seguir abre un issue de Permiso: [niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#permiso).
 
 ## Prompt para claude.ai
 
@@ -35,15 +35,13 @@ publico: a quién va dirigido
 que_debe_lograr: un efecto observable en el público (qué siente, entiende, hace o dice al verlo). "Que se vea bonito" no sirve.
 fuera_de_alcance: lo que esta pieza NO va a hacer
 presupuesto_creditos: un número entero, 0 o más (créditos de Higgsfield que pienso gastar)
-personas_reales: si o no (si aparece la cara o la voz de alguien real identificable, incluida una parodia, o un menor, es "si")
-issue_permiso: solo si personas_reales es si; el número del issue, con formato #N
 drive: link de mi carpeta de Google Drive que empieza con https://drive.google.com/
 
 Reglas:
 1. Si mi que_debe_lograr es vago, empújame UNA vez con la pregunta "¿Qué debería hacer, decir o sentir alguien al terminar de verlo?". Si respondo algo concreto, úsalo.
 2. Si el formato que quiero no es corto, redes ni transmedia, dime una vez que el curso trabaja con esos tres y pregúntame cuál se parece más. Si insisto, no escribas un valor inválido: dime que lo hable con Daria.
-3. Si personas_reales es si: explícame en dos líneas que eso requiere un issue de Permiso aprobado por Daria antes de generar nada, y redáctame el texto del issue con estos puntos: qué quiero hacer, por qué, qué toca, riesgo, cómo lo reviertes. No inventes el número del issue: me lo tengo que dar yo cuando lo cree.
-4. Dime el nivel de este cambio: el brief es nivel "Aviso" (si hay personas reales, es "Permiso").
+3. Si el tema de mi pieza es sensible, explícame en dos líneas que eso requiere un issue de Permiso aprobado por Daria antes de generar nada, y redáctame el texto del issue con estos puntos: qué quiero hacer, por qué, qué toca, riesgo, cómo lo reviertes. No inventes el número del issue: me lo tengo que dar yo cuando lo cree.
+4. Dime el nivel de este cambio: el brief es nivel "Aviso" (si el tema es sensible, es "Permiso").
 
 Al terminar, muéstrame el brief completo dentro de un bloque de texto, así:
 ---

@@ -27,8 +27,6 @@ CAMPOS_BRIEF = [
     "que_debe_lograr",
     "fuera_de_alcance",
     "presupuesto_creditos",
-    "personas_reales",
-    "issue_permiso",
     "drive",
 ]
 FORMATOS = ("corto", "redes", "transmedia")
@@ -45,7 +43,6 @@ LIMITE_BYTES = 1024 * 1024
 LIMITE_LECTURA_TEXTO = 5 * 1024 * 1024
 
 RE_DRIVE = re.compile(r"^https://drive\.google\.com/\S+$")
-RE_ISSUE = re.compile(r"^#\d+$")
 RE_ID_PLANO = re.compile(r"^P\d{2}$")
 RE_ID_SEGURO = re.compile(r"^[A-Za-z0-9_-]+$")
 RE_DAS = re.compile(r"\bDAS-\d+\b")
@@ -257,13 +254,9 @@ def revisar_brief(repo, modo, res):
 
     faltantes = []
     for campo in CAMPOS_BRIEF:
-        if campo == "issue_permiso":
-            continue  # solo se exige si personas_reales es si; se revisa abajo
         if es_placeholder(datos.get(campo)):
             faltantes.append(campo)
 
-    personas = datos.get("personas_reales", "")
-    personas_si = (not es_placeholder(personas)) and personas.strip().lower() == "si"
     if faltantes:
         if modo == "plantilla":
             res.aviso("brief-incompleto", "00_brief.md",
@@ -307,33 +300,6 @@ def revisar_brief(repo, modo, res):
             "Corrige el campo y sube el cambio. Si necesitas pasarte del tope, abre un issue de permiso.",
             area="brief",
         )
-
-    if not es_placeholder(personas) and personas.strip().lower() not in ("si", "no"):
-        res.falla(
-            "brief-personas-reales", "00_brief.md",
-            "personas_reales debe ser si o no; encontré `%s`." % personas,
-            "Ética y derechos · aquí declaras si aparece la cara o la voz de alguien real · "
-            + link("etica-y-derechos.md", "personas-reales"),
-            ["Escribe `si` si aparece la cara o voz de una persona real identificable.",
-             "Escribe `no` si solo hay objetos, paisajes o personajes inventados."],
-            "Corrige el campo y sube el cambio.",
-            area="brief",
-        )
-
-    issue = datos.get("issue_permiso")
-    if personas_si:
-        if es_placeholder(issue) or not RE_ISSUE.match(issue.strip()):
-            res.falla(
-                "personas-reales-sin-issue", "00_brief.md",
-                "Marcaste personas_reales: si, pero issue_permiso no tiene un issue válido (formato #N).",
-                "Nivel Permiso · la cara o voz de una persona real necesita autorización antes de empezar · "
-                + link("niveles.md", "permiso"),
-                ["Abre un issue con la etiqueta `permiso` y escribe su número en issue_permiso, por ejemplo #4.",
-                 "Si en realidad no aparece nadie real, cambia personas_reales a `no`.",
-                 "Pídele a Daria que revise tu caso si tienes dudas."],
-                "Abre un issue de permiso; la receta /lca425:cierre te lo redacta.",
-                area="brief",
-            )
 
     drive = datos.get("drive")
     if not es_placeholder(drive) and not RE_DRIVE.match(drive.strip()):
@@ -583,34 +549,6 @@ def revisar_shotlist(repo, brief, res, yamlc, escenas=None):
                     ["Sube el clip a tu carpeta de Drive y pega su link en clip_url (https://drive.google.com/...).",
                      "Si todavía no lo generas, regresa el estado a `prompt`."],
                     "Agrega clip_url y sube el cambio. Nunca subas el video al repo.",
-                    area="shotlist",
-                )
-
-        pr = norm_sino(p.get("persona_real"))
-        if pr is None:
-            res.falla(
-                "shotlist-persona-real", rel,
-                "El plano %s necesita persona_real: si o no." % etiqueta,
-                "Ética y derechos · en cada plano declaras si aparece alguien real · "
-                + link("etica-y-derechos.md", "personas-reales"),
-                ["Escribe `no` si solo hay objetos, paisajes o personajes inventados.",
-                 "Escribe `si` si aparece la cara o voz de alguien real; entonces necesitas permiso."],
-                "Corrige el campo y sube el cambio.",
-                area="shotlist",
-            )
-        elif pr == "si":
-            issue = brief.get("issue_permiso", "")
-            personas = (brief.get("personas_reales", "") or "").strip().lower()
-            if personas != "si" or es_placeholder(issue) or not RE_ISSUE.match(issue.strip()):
-                res.falla(
-                    "persona-real-sin-permiso", rel,
-                    "El plano %s tiene persona_real: si, pero el brief no declara un issue de permiso." % etiqueta,
-                    "Nivel Permiso · la cara o voz de una persona real necesita autorización antes de empezar · "
-                    + link("niveles.md", "permiso"),
-                    ["Abre un issue con la etiqueta `permiso`, y en 00_brief.md pon personas_reales: si e issue_permiso: #N.",
-                     "Si el plano no tiene a nadie real, cambia persona_real a `no`.",
-                     "Pídele a Daria que revise tu caso."],
-                    "Abre un issue de permiso; la receta /lca425:cierre te lo redacta.",
                     area="shotlist",
                 )
 
@@ -1028,41 +966,6 @@ def revisar_pr(cuerpo, res):
                 "Completa las dos líneas en la descripción del PR; el gate se vuelve a correr al guardarla.",
             )
 
-    # Personas reales
-    sec = secs.get("personas reales")
-    if sec is None:
-        falta_seccion("Personas reales", "pr-personas-reales", "etica-y-derechos.md", "personas-reales",
-                      "Ética y derechos · la cara o voz de alguien real necesita permiso")
-    else:
-        marcadas = []
-        for marcada, etiqueta in casillas(sec):
-            if marcada:
-                marcadas.append(etiqueta)
-        palabras = [sin_acentos(e).lower() for e in marcadas]
-        no = [e for e, p in zip(marcadas, palabras) if re.match(r"^no\b", p)]
-        si = [e for e, p in zip(marcadas, palabras) if re.match(r"^si\b", p)]
-        if len(marcadas) != 1 or (not no and not si):
-            res.falla(
-                "pr-personas-reales", archivo,
-                "En `## Personas reales` debe haber exactamente una casilla marcada: No, o Sí con su issue.",
-                "Ética y derechos · la cara o voz de alguien real necesita permiso · "
-                + link("etica-y-derechos.md", "personas-reales"),
-                ["Marca No si solo hay objetos, paisajes o personajes inventados.",
-                 "Marca Sí y escribe el número de tu issue de permiso, por ejemplo #4."],
-                "Edita la descripción del PR; si marcas Sí, abre antes un issue de permiso.",
-            )
-        elif si and not re.search(r"#\d+", si[0]):
-            res.falla(
-                "pr-personas-reales", archivo,
-                "Marcaste Sí en `## Personas reales`, pero no escribiste el número del issue de permiso (#N).",
-                "Nivel Permiso · la cara o voz de una persona real necesita autorización antes de empezar · "
-                + link("niveles.md", "permiso"),
-                ["Escribe el número de tu issue de permiso, por ejemplo #4.",
-                 "Si no aparece nadie real, marca No.",
-                 "Pídele permiso a Daria con un issue de permiso si todavía no lo abres."],
-                "Abre un issue de permiso; la receta /lca425:cierre te lo redacta.",
-            )
-
 
 # ---------------------------------------------------------------- orquestación
 
@@ -1085,7 +988,7 @@ def ejecutar(repo_path, modo="alumno", pr_body=None, solo_palabras=False):
 
     # areas
     if (repo / "00_brief.md").is_file():
-        incompleto = any(es_placeholder(brief.get(c)) for c in CAMPOS_BRIEF if c != "issue_permiso")
+        incompleto = any(es_placeholder(brief.get(c)) for c in CAMPOS_BRIEF)
         res.areas["brief"] = "borrador" if (res.hay_falla("brief") or incompleto or not brief) else "funciona"
     return res
 

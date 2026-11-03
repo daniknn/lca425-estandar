@@ -32,7 +32,7 @@ Cada cambio tiene un nivel. Lo declaras en el PR. Si dudas, el más alto.
 - **Libre**: mergeas tú con el gate en verde.
 - **Aviso**: mergeas con el gate en verde; Daria revisa en la clase siguiente.
 - **Revisión**: Daria aprueba el PR antes del merge.
-- **Permiso**: abres un issue de autorización antes de empezar.
+- **Permiso**: abres un issue de autorización antes de empezar. Solo para temas sensibles, pasarte del tope de créditos o publicar fuera del aula.
 
 Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#libre).
 
@@ -74,16 +74,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - **Por qué:** Git no sirve para video: el repo se hincha y no hay forma limpia de quitarlo.
 - **Lo impone:** el gate y el `.gitignore` de la plantilla. Si ya subiste un binario: [qué hacer](https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#binario-subido).
 
-### 5. Personas reales, menores y temas sensibles: Permiso antes de empezar
-
-- **Regla:** Si la pieza usa la cara o la voz de una persona real, a un menor o un tema sensible, abre un issue de Permiso antes de generar nada.
-- **Cuándo:** En el brief, apenas aparezca la idea. Incluye compañeros, familia, figuras públicas, parodia y personas fallecidas.
-- **Cómo:** Abre el issue con la plantilla "Permiso" de tu repo; su título empieza con `[Permiso]` (detalle en [niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#permiso)), marca `personas_reales: si` en el brief y cita `#N`. Guarda el consentimiento como dice [ética y derechos](https://github.com/daniknn/lca425-estandar/blob/main/docs/etica-y-derechos.md#consentimiento).
-- **Check:** El brief y cada plano afectado citan el issue y el issue tiene respuesta de Daria.
-- **Por qué:** Una persona real no puede deshacer que su cara o su voz circulen.
-- **Lo impone:** el gate (campo `personas_reales`) y los hooks de herramientas de riesgo de Higgsfield.
-
-### 6. Tope de créditos en el brief
+### 5. Tope de créditos en el brief
 
 - **Regla:** Fija un tope de créditos en el brief y no lo superes sin Permiso.
 - **Cuándo:** Al escribir el brief y antes de cada tanda de clips.
@@ -92,16 +83,16 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - **Por qué:** Los créditos son tuyos y se acaban; un clip mal pedido no se reembolsa.
 - **Lo impone:** el hook revisa que consultes el saldo antes de generar, desde la clase 14.
 
-### 7. Declara el uso de IA en cada PR
+### 6. Declara el uso de IA y acredita lo que no hiciste
 
-- **Regla:** Cada PR dice qué hizo la IA y qué hiciste tú.
+- **Regla:** Cada PR dice qué hizo la IA y qué hiciste tú, y acredita el material de terceros.
 - **Cuándo:** Al abrir el PR.
-- **Cómo:** Llena la sección `## Uso de IA` con "Hizo la IA:" e "Hice yo:". Sé específico: "Claude propuso tres finales; yo elegí el segundo y reescribí el diálogo".
-- **Check:** Las dos líneas existen y no están vacías.
+- **Cómo:** Llena la sección `## Uso de IA` con "Hizo la IA:" e "Hice yo:". Sé específico: "Claude propuso tres finales; yo elegí el segundo y reescribí el diálogo". Si usas música, imágenes, logos o voces que no hiciste, anota en el PR quién los hizo y de dónde salen.
+- **Check:** Las dos líneas existen y no están vacías, y el material de terceros tiene su crédito.
 - **Por qué:** Se evalúa tu criterio, no el de la herramienta. Declararlo también te protege.
 - **Lo impone:** el gate.
 
-### 8. Reto en frío antes de entregar en Revisión
+### 7. Reto en frío antes de entregar en Revisión
 
 - **Regla:** Antes de una entrega de nivel Revisión, pide a un modelo distinto al que escribió el material que intente romperlo.
 - **Cuándo:** Después de tener guion y shotlist, y otra vez antes de la entrega final.
@@ -110,7 +101,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - **Por qué:** Quien escribió algo es el peor revisor de eso mismo.
 - **Lo impone:** el gate exige la sección `## Reto en frío` en los PR de nivel Revisión, con cada hallazgo respondido. Cómo responder: [reto en frío](https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#reto-en-frio).
 
-### 9. Sin secretos en el repo
+### 8. Sin secretos en el repo
 
 - **Regla:** No pongas contraseñas, tokens ni llaves en ningún archivo, prompt ni mensaje de commit.
 - **Cuándo:** Siempre. Cuidado con `.mcp.json`, `settings.local.json` y capturas de pantalla.
@@ -119,7 +110,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - **Por qué:** Un repo público o compartido expone cualquier llave que haya tocado.
 - **Lo impone:** el gate y el `.gitignore` de la plantilla.
 
-### 10. Cuando algo se bloquea: el mensaje de 4 partes, sin rodeos
+### 9. Cuando algo se bloquea: el mensaje de 4 partes, sin rodeos
 
 - **Regla:** Si algo te bloquea, lee el mensaje, elige una opción y nunca busques cómo saltarte el bloqueo.
 - **Cuándo:** Cada vez que el gate, un hook o Claude digan "no".
@@ -128,7 +119,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - **Por qué:** El bloqueo marca un riesgo real; saltarlo lo vuelve tuyo.
 - **Lo impone:** los hooks y el gate usan este formato en todos sus mensajes.
 
-### 11. Claude no inventa
+### 10. Claude no inventa
 
 - **Regla:** Claude no inventa datos, fechas, créditos ni resultados tuyos; lo que no sabe lo marca "por verificar".
 - **Cuándo:** Al redactar PRs, bitácoras, lecciones y reportes de gasto.
@@ -136,7 +127,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - **Check:** Cada cifra, fecha o resultado del PR tiene fuente o dice "por verificar".
 - **Por qué:** Un dato inventado que nadie nota es peor que un hueco visible.
 
-### 12. Una pregunta, un lugar
+### 11. Una pregunta, un lugar
 
 - **Regla:** Cada tipo de información tiene un solo lugar; no la repitas en otro.
 - **Cuándo:** Cada vez que vayas a escribir algo.
@@ -149,7 +140,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - Responde en español de México, de tú, con frases cortas. La persona es estudiante de cine, no desarrolladora.
 - Pregunta antes de asumir. Si estás enseñando, una pregunta a la vez.
 - Antes de empezar cualquier cambio, clasifica su nivel (Libre, Aviso, Revisión o Permiso) y dilo en voz alta.
-- Pregunta siempre si aparece una persona real, un menor o un tema sensible. Si la respuesta es sí, para y manda a abrir el issue de Permiso.
+- Pregunta si el cambio toca un tema sensible, te pasas del tope de créditos o la pieza saldrá del aula. Si la respuesta es sí, para y manda a abrir el issue de Permiso. Que salga alguien real, familiar o menor no es tema sensible ni motivo de Permiso.
 - No edites archivos del gate ni de los hooks, ni los de configuración de permisos. No des rodeos a un bloqueo.
 - Antes de reportar avance, comprueba cada afirmación contra el resultado de una herramienta. Sin comprobación, di "por verificar".
 - Cuando algo se bloquee, explica las 4 partes con tus palabras y deja que el alumno elija.
@@ -160,9 +151,8 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 | Muro | Qué revisa | Estado |
 |---|---|---|
 | Protección de ramas en GitHub | Que nadie suba directo a `main` | **Disuasión, no muro**: tu repo vive en tu cuenta y Daria no puede bloquear pushes. Por eso la regla 2 la imponen los hooks del plugin y el gate revisa cada PR |
-| Gate (CI, fuera de tu repo) | Brief completo, estructura del repo, sin binarios, sin secretos, sin palabras prohibidas, formato del guion, `escena` y `proposito` en cada plano, secciones del PR (Nivel, Qué cambia, Uso de IA, Personas reales y, en Revisión, Reto en frío) | Activo en cada PR |
+| Gate (CI, fuera de tu repo) | Brief completo, estructura del repo, sin binarios, sin secretos, sin palabras prohibidas, formato del guion, `escena` y `proposito` en cada plano, secciones del PR (Nivel, Qué cambia, Uso de IA y, en Revisión, Reto en frío) | Activo en cada PR |
 | Hooks del plugin | Push a `main`, `--force` y `--no-verify` | Activos con el plugin instalado |
-| Hooks de Higgsfield | Herramientas de riesgo (voces, doblaje, influencers, subir o importar media, publicar) | Activos con el plugin instalado |
 | Hook de saldo | Consultar saldo y costo antes de generar | Desde la clase 14 |
 
 Los hooks solo existen si instalaste el plugin. Quien trabaja en GitHub web tiene el gate y a Daria como muro.

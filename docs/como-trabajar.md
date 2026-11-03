@@ -26,7 +26,7 @@ Tu primer PR: completar `00_brief.md`.
 3. Abre tu repo de proyecto en Claude Code.
 4. Escribe `/lca425:brief`. Claude te hará una pregunta a la vez.
 5. Claude crea la rama, hace el cambio y abre el PR. El brief es nivel Aviso: lo mergeas con el gate en verde y Daria lo revisa en la clase siguiente.
-6. Llena el PR: Nivel, Qué cambia, Uso de IA, Personas reales.
+6. Llena el PR: Nivel, Qué cambia, Uso de IA.
 7. Espera la marca verde del gate y mergea.
 
 ### Vía B: solo GitHub web y claude.ai
@@ -37,7 +37,7 @@ Para quien no tiene plan de pago de Claude.
 2. En GitHub, abre tu repo, entra a `00_brief.md` y pulsa el lápiz (Edit).
 3. Pega el texto. Al guardar, elige "Create a new branch for this commit" y ponle un nombre corto, como `brief-v1`. Nunca elijas "commit directly to main".
 4. Pulsa "Propose changes" y luego "Create pull request".
-5. Llena el PR: Nivel (el brief es Aviso), Qué cambia, Uso de IA, Personas reales.
+5. Llena el PR: Nivel (el brief es Aviso), Qué cambia, Uso de IA.
 6. Espera la marca verde. Si no llega, abre "Details", lee el mensaje y corrige.
 7. Cuando esté en verde, pulsa "Merge pull request".
 

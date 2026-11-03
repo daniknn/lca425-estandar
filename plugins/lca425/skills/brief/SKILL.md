@@ -12,8 +12,9 @@ Objetivo: que el alumno salga con un `00_brief.md` completo y válido, un PR abi
 - Pregunta antes de explicar. Una pregunta por turno. Si hay herramienta de preguntas (AskUserQuestion), úsala con opciones cortas; si no, pregunta en texto.
 - Si el alumno ya dio respuestas en su mensaje, no las repitas: mapea lo que dio y pregunta solo lo que falta.
 - Ofrece al inicio el modo rápido: "Si prefieres, dime 'solo dime qué sigue' y te voy diciendo el siguiente paso sin explicaciones." En modo rápido: una línea con lo siguiente, sin teoría.
-- Nunca inventes datos del alumno (título, público, link de Drive, créditos, personas). Si falta algo, pregúntalo. Una sugerencia tuya va marcada como sugerencia y solo se escribe si el alumno la acepta.
+- Nunca inventes datos del alumno (título, público, link de Drive, créditos). Si falta algo, pregúntalo. Una sugerencia tuya va marcada como sugerencia y solo se escribe si el alumno la acepta.
 - Tono: español de México, de tú, cálido y breve. Sin regaños.
+- Que en la pieza salga alguien real (un familiar, un compañero, un menor) no cambia nada: no es tema sensible, así que no pidas consentimiento, no preguntes por esa persona ni abras Permiso por eso. Tema sensible es el asunto de la historia que podría lastimar, como violencia, salud o una tragedia.
 
 ## Esquema (fuente: `esquema.md` del curso)
 
@@ -28,8 +29,6 @@ Frontmatter plano `clave: valor`, una línea por clave, sin anidar:
 | `que_debe_lograr` | efecto observable en el público |
 | `fuera_de_alcance` | texto |
 | `presupuesto_creditos` | entero mayor o igual a 0 |
-| `personas_reales` | `si` o `no` |
-| `issue_permiso` | `#N`, obligatorio solo si `personas_reales: si` |
 | `drive` | URL `https://drive.google.com/...` de la carpeta del proyecto |
 
 Vacío, `TODO`, `...` o algo entre `< >` cuenta como faltante.
@@ -38,8 +37,8 @@ Vacío, `TODO`, `...` o algo entre `< >` cuenta como faltante.
 
 1. `que_debe_lograr` debe ser un efecto observable en el público: qué siente, entiende, hace o dice. "Que se vea bonito" o "que se vea padre" no lo es. Empuja una sola vez, con una pregunta: "¿Qué debería hacer, decir o sentir alguien al terminar de verlo?" Si el alumno responde algo concreto, úsalo. Si insiste en lo vago, escribe lo que decida y avísale que Daria puede pedirle afinarlo. Mientras no haya respuesta, no escribas el valor vago.
 2. `formato` fuera de corto, redes o transmedia: empuja una vez ("el curso trabaja con estos tres; ¿cuál se parece más a lo que imaginas?"). Si insiste, no escribas un valor inválido: dile que lo hable con Daria y deja el campo sin llenar.
-3. `personas_reales: si` incluye cara o voz de alguien identificable, parodia incluida, y menores. Entonces explica en dos líneas que eso es nivel Permiso ([niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#permiso), [ética y derechos](https://github.com/daniknn/lca425-estandar/blob/main/docs/etica-y-derechos.md#personas-reales)) y redacta el texto del issue: qué quiero hacer, por qué, qué toca, riesgo, cómo lo reviertes. No lo crees sin el OK del alumno. Con el OK: `gh issue create --title "[Permiso] ..." --body-file ...` (el cuerpo sigue las secciones de `.github/ISSUE_TEMPLATE/permiso.md` del repo), y el `#N` que devuelva va en `issue_permiso`. Si no hay OK o `gh` no sirve, el alumno crea el issue a mano y te dice el número. No escribas un `#N` inventado.
-4. El brief se clasifica Aviso: lo dices en voz alta ("esto es nivel Aviso: mergeas con el gate en verde y Daria lo revisa la clase siguiente"). Si hay personas reales, el cambio completo es Permiso hasta que Daria responda.
+3. Si el tema del brief es sensible, explica en dos líneas que eso es nivel Permiso ([niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#permiso)) y redacta el texto del issue: qué quiero hacer, por qué, qué toca, riesgo, cómo lo reviertes. No lo crees sin el OK del alumno. Con el OK: `gh issue create --title "[Permiso] ..." --body-file ...` (el cuerpo sigue las secciones de `.github/ISSUE_TEMPLATE/permiso.md` del repo); el PR cita el `#N` que devuelva. Si no hay OK o `gh` no sirve, el alumno crea el issue a mano y te dice el número. No escribas un `#N` inventado.
+4. El brief se clasifica Aviso: lo dices en voz alta ("esto es nivel Aviso: mergeas con el gate en verde y Daria lo revisa la clase siguiente"). Si el tema es sensible, el cambio completo es Permiso hasta que Daria responda.
 
 ## Pasos
 
@@ -58,7 +57,6 @@ Vacío, `TODO`, `...` o algo entre `< >` cuenta como faltante.
     - `## Nivel`: Aviso (o Permiso si aplica).
     - `## Qué cambia`: una o dos líneas sobre el brief.
     - `## Uso de IA`: `Hizo la IA:` lo que sí hiciste en la sesión (preguntar, ordenar, redactar, correr el gate) y `Hice yo:` lo que dijo el alumno.
-    - `## Personas reales`: `No` marcado, o `Sí` marcado con `#N`.
     Escribe el cuerpo en un archivo temporal y usa `gh pr create --base main --head brief --title "docs: brief" --body-file <archivo>`.
     Si `gh` no está autenticado (`gh auth status` falla), no pelees con eso: entrega el link que imprimió GitHub y el texto del PR para pegar.
 11. Cierra con una sola pregunta: "¿Quieres que sigamos con el guion o prefieres que Daria revise primero?"

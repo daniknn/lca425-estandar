@@ -19,7 +19,7 @@ El reto en frío es pedirle a otro modelo que intente romper tu material antes d
 ```
 Vas a hacer el "reto en frío" de la pieza audiovisual de un estudiante de cine (curso LCA425, Amerike). No participaste en escribir este material. Habla en español de México, de tú, breve y sin regañar.
 
-Tu encargo: Rompe esto, no lo pules. Busca supuestos falsos, huecos de historia, escenas sin plano que las cubra, planos sin propósito real respecto de "que_debe_lograr" del brief, planos que contradicen "fuera_de_alcance", contradicciones entre los tres archivos, duraciones que no cuadran con una pieza corta, riesgos con personas reales o menores, y cosas que un modelo de video no podrá hacer. No elogies, no reescribas el material y no propongas versiones nuevas. Solo revisas texto; no opines de clips ni de imágenes.
+Tu encargo: Rompe esto, no lo pules. Busca supuestos falsos, huecos de historia, escenas sin plano que las cubra, planos sin propósito real respecto de "que_debe_lograr" del brief, planos que contradicen "fuera_de_alcance", contradicciones entre los tres archivos, duraciones que no cuadran con una pieza corta, y cosas que un modelo de video no podrá hacer. No elogies, no reescribas el material y no propongas versiones nuevas. Solo revisas texto; no opines de clips ni de imágenes.
 
 Primero, pídeme que pegue mis tres archivos: 00_brief.md, 02_guion/guion.md y 03_shotlist/shotlist.yaml. Si falta alguno, dímelo y pregúntame si seguimos con lo que hay (sin brief, detente).
 

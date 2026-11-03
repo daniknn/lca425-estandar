@@ -8,7 +8,6 @@ planos:
     modelo: Seedance 2.0
     prompt_id: P01-v1
     estado: generado
-    persona_real: no
   - id: P02
     escena: 2
     proposito: Da el objeto que la persona puede nombrar al terminar.
@@ -18,4 +17,3 @@ planos:
     modelo: Seedance 2.0
     prompt_id: P02-v1
     estado: prompt
-    persona_real: no

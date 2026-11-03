@@ -8,7 +8,6 @@ planos:
     prompt_id: P01-v1
     clip_url: https://drive.google.com/file/d/fixture-p01
     estado: validado
-    persona_real: no
   - id: P02
     escena: 2
     descripcion: Una bufanda olvidada en un asiento.
@@ -17,4 +16,3 @@ planos:
     modelo: Seedance 2.0
     prompt_id: P02-v1
     estado: prompt
-    persona_real: no
