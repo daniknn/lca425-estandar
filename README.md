@@ -15,5 +15,4 @@ En Claude Code:
 
 - [Reglas del curso](https://github.com/daniknn/lca425-estandar/blob/main/AGENTS.md)
 - [Niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#libre)
-- [Ética y derechos (versión 0)](https://github.com/daniknn/lca425-estandar/blob/main/docs/etica-y-derechos.md#personas-reales)
 - [Cómo trabajar](https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#tu-primer-pr)

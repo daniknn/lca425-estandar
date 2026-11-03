@@ -4,7 +4,7 @@
 - [x] Libre: notas
 - [x] Aviso: borradores
 - [ ] Revisión: entregas
-- [ ] Permiso: persona real
+- [ ] Permiso: tope de créditos
 
 ## Qué cambia
 
@@ -14,8 +14,3 @@ Agregué el brief y el primer plano del shotlist.
 
 Hizo la IA: me ayudó a redactar la descripción del plano.
 Hice yo: escribí la idea y elegí la cámara.
-
-## Personas reales
-
-- [x] No
-- [ ] Sí, issue de permiso: #N

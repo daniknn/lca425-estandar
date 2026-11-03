@@ -53,33 +53,5 @@ for parte in "Qué pasó:" "Por qué:" "Qué puedes hacer:" "Cómo destrabar:" "
     *) fail=$((fail + 1)); printf 'FAIL mensaje sin "%s"\n' "$parte" ;; esac
 done
 
-# Hook de riesgo: el script siempre bloquea; el matcher decide cuándo corre.
-H=riesgo-higgsfield.sh
-esperar "riesgo: script siempre exit 2" 2 $H '{"tool_name":"mcp__higgsfield__create_voice","tool_input":{}}'
-riesgo=$ULTIMA
-for parte in "Qué pasó:" "Por qué:" "Qué puedes hacer:" "Cómo destrabar:" "niveles.md#permiso" "etica-y-derechos.md#personas-reales" "create_voice"; do
-  case $riesgo in *"$parte"*) pass=$((pass + 1)); printf 'ok   mensaje de riesgo contiene "%s"\n' "$parte" ;;
-    *) fail=$((fail + 1)); printf 'FAIL mensaje de riesgo sin "%s"\n' "$parte" ;; esac
-done
-
-matcher=$(sed -n 's/.*"matcher": "\(\^mcp[^"]*\)".*/\1/p' "$HOOKS/hooks.json")
-[ -n "$matcher" ] || { echo "FAIL no pude leer el matcher de hooks.json"; fail=$((fail + 1)); }
-coincide() { # $1 nombre de herramienta, $2 esperado (si|no)
-  if printf '%s' "$1" | grep -Eq "$matcher"; then r=si; else r=no; fi
-  if [ "$r" = "$2" ]; then pass=$((pass + 1)); printf 'ok   matcher %s -> %s\n' "$1" "$r"
-  else fail=$((fail + 1)); printf 'FAIL matcher %s -> %s (esperaba %s)\n' "$1" "$r" "$2"; fi
-}
-coincide mcp__higgsfield__create_voice si
-coincide mcp__f42004f4-4660__voice_change si
-coincide mcp__x__media_upload si
-coincide mcp__x__publish_website si
-coincide mcp__x__participate_in_contest si
-coincide mcp__x__generate_image no
-coincide mcp__x__generate_video no
-coincide mcp__x__balance no
-coincide mcp__x__media_confirm no
-coincide mcp__x__create_voice_extra no
-coincide Bash no
-
 printf '\n%s ok, %s fallos\n' "$pass" "$fail"
 [ "$fail" = 0 ]

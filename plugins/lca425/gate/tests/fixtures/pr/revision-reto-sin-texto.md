@@ -3,7 +3,7 @@
 - [ ] Libre: notas
 - [ ] Aviso: borradores
 - [x] Revisión: entregas
-- [ ] Permiso: persona real
+- [ ] Permiso: tope de créditos
 
 ## Qué cambia
 
@@ -13,11 +13,6 @@ Entrego el guion y el shotlist de la pieza.
 
 Hizo la IA: ordenó mis escenas y propuso planos de cobertura.
 Hice yo: escribí las escenas y elegí qué planos aceptar.
-
-## Personas reales
-
-- [x] No
-- [ ] Sí, issue de permiso: #N
 
 ## Reto en frío
 

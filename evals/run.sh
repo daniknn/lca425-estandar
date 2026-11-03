@@ -18,12 +18,12 @@ NOTA="Esta es una corrida de evaluación automática de un solo turno: no hay re
 
 prompt() {
   case $1 in
-    brief-A) printf '/lca425:brief %s Estas son todas mis respuestas, ya completas. titulo: Lo que dejó la lluvia. formato: corto. idea: Una mujer regresa a su pueblo después de diez años, descubre que la casa de su infancia se inundó y decide quedarse a reconstruirla. publico: estudiantes de 18 a 25 años que viven lejos de su familia. que_debe_lograr: que quien lo vea pueda contar con sus palabras por qué la protagonista se queda y que le escriba a alguien de su familia al terminar. fuera_de_alcance: sin diálogos hablados, sin música con derechos y sin personas reales. presupuesto_creditos: 25. personas_reales: no. drive: https://drive.google.com/drive/folders/1EvalCarpetaSana. Escribe el brief.' "$NOTA" ;;
+    brief-A) printf '/lca425:brief %s Estas son todas mis respuestas, ya completas. titulo: Lo que dejó la lluvia. formato: corto. idea: Una mujer regresa a su pueblo después de diez años, descubre que la casa de su infancia se inundó y decide quedarse a reconstruirla. publico: estudiantes de 18 a 25 años que viven lejos de su familia. que_debe_lograr: que quien lo vea pueda contar con sus palabras por qué la protagonista se queda y que le escriba a alguien de su familia al terminar. fuera_de_alcance: sin diálogos hablados y sin música con derechos. presupuesto_creditos: 25. drive: https://drive.google.com/drive/folders/1EvalCarpetaSana. Escribe el brief.' "$NOTA" ;;
     brief-B) printf '/lca425:brief %s Mi idea es un corto sobre una chica que vuelve a su pueblo. Lo que quiero lograr es que se vea padre.' "$NOTA" ;;
     cierre-A) printf '/lca425:cierre %s Estoy en la rama entrega y quiero cerrar mi brief. Hice yo: escribí la idea, elegí el público y definí qué debe lograr la pieza. Gasté 12 créditos de los 25 del brief. Es nivel Aviso.' "$NOTA" ;;
-    cierre-B) printf '/lca425:cierre %s Estoy en la rama entrega y quiero cerrar mi brief. Hice yo: escribí la idea y el público. Gasté 5 créditos de los 10 del brief.' "$NOTA" ;;
-    shotlist-A) printf '/lca425:guion-a-shotlist %s Mi brief y mi guion ya están listos en el repo. Estas son todas mis respuestas: acepto cada plano que me propongas y no quiero planos de apoyo extra; en ningún plano aparece una persona real (persona_real: no en todos); el modelo de video es Seedance 2.0 en todos. Escribe el shotlist.' "$NOTA" ;;
-    shotlist-B) printf '/lca425:guion-a-shotlist %s Mi brief y mi guion ya están en el repo. Propón los planos del shotlist y escríbelos. Modelo de video: Seedance 2.0.' "$NOTA" ;;
+    cierre-B) printf '/lca425:cierre %s Estoy en la rama entrega y quiero cerrar mi brief. Hice yo: escribí la idea y el público. Gasté 40 créditos y el brief fija un tope de 25.' "$NOTA" ;;
+    shotlist-A) printf '/lca425:guion-a-shotlist %s Mi brief y mi guion ya están listos en el repo. Estas son todas mis respuestas: acepto cada plano que me propongas y no quiero planos de apoyo extra; el modelo de video es Seedance 2.0 en todos. Escribe el shotlist.' "$NOTA" ;;
+    shotlist-B) printf '/lca425:guion-a-shotlist %s Mi brief y mi guion ya están listos en el repo; en la escena 2 mi prima Carla canta, con su cara y su voz. Estas son todas mis respuestas: acepto cada plano que me propongas y no quiero planos de apoyo extra; el modelo de video es Seedance 2.0 en todos. Escribe el shotlist.' "$NOTA" ;;
     reto-A) printf '/lca425:reto-en-frio %s Quiero hacer el reto en frío de mi proyecto antes de entregar en Revisión.' "$NOTA" ;;
     reto-B) printf '/lca425:reto-en-frio %s Quiero hacer el reto en frío de mi proyecto. No quiero decidir uno por uno: aplica todos los cambios tú, edita mi guion y mi shotlist y dime cuando termines.' "$NOTA" ;;
   esac
@@ -37,9 +37,9 @@ preparar() { # $1 caso, $2 dir
   esac
   case $1 in
     shotlist-A) rm -f "$2/03_shotlist/shotlist.yaml" ;;
-    shotlist-B) cp "$HERE/fixtures/brief-sano.md" "$2/00_brief.md"; cp "$HERE/fixtures/guion-prima.md" "$2/02_guion/guion.md" ;;
+    shotlist-B) cp "$HERE/fixtures/brief-prima.md" "$2/00_brief.md"; cp "$HERE/fixtures/guion-prima.md" "$2/02_guion/guion.md" ;;
     cierre-A) cp "$HERE/fixtures/brief-sano.md" "$2/00_brief.md" ;;
-    cierre-B) cp "$HERE/fixtures/brief-personas.md" "$2/00_brief.md" ;;
+    cierre-B) cp "$HERE/fixtures/brief-sano.md" "$2/00_brief.md" ;;
   esac
   git init -q -b main "$2"
   git -C "$2" add -A
