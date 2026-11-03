@@ -46,6 +46,11 @@ preparar() { # $1 caso, $2 dir
     cierre-A) cp "$HERE/fixtures/brief-sano.md" "$2/00_brief.md" ;;
     cierre-B) cp "$HERE/fixtures/brief-sano.md" "$2/00_brief.md" ;;
     creditos-A) cp -R "$HERE/fixtures/creditos-excedidos/." "$2/" ;;
+    prompt-*)
+      # El ejemplo ya trae prompts de P02 a P06; se regresan a idea para que la receta tenga trabajo real.
+      rm -f "$2"/04_prompts/P0[2-6]-v*.yaml
+      awk '/^  - id: P0[2-6]$/{f=1} /^  - id: P01$/{f=0} f && /^    prompt_id: /{next} f && /^    estado: /{print "    estado: idea"; next} {print}' \
+        "$2/03_shotlist/shotlist.yaml" > "$2/03_shotlist/s.tmp" && mv "$2/03_shotlist/s.tmp" "$2/03_shotlist/shotlist.yaml" ;;
   esac
   git init -q -b main "$2"
   git -C "$2" add -A

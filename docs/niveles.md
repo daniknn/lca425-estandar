@@ -8,7 +8,7 @@ Regla de oro: el nivel depende de lo que toca el cambio, no de qué tan grande e
 |---|---|---|
 | Libre | Tú | Mergeas con el gate en verde |
 | Aviso | Tú, y Daria revisa después | Mergeas con el gate en verde; Daria revisa en la clase siguiente |
-| Revisión | Daria | Daria aprueba el PR antes del merge |
+| Revisión | Tú, y Daria califica después | Mergeas con el gate en verde; el gate exige el reto en frío respondido |
 | Permiso | Daria | Issue de autorización antes de empezar |
 
 <a id="libre"></a>
@@ -38,14 +38,13 @@ Regla de oro: el nivel depende de lo que toca el cambio, no de qué tan grande e
 <a id="revision"></a>
 ## Revisión
 
-**Qué pasa:** Daria aprueba el PR antes de que mergees. Antes de pedirle revisión, haces el reto en frío con otro modelo (regla 7 del [AGENTS.md](https://github.com/daniknn/lca425-estandar/blob/main/AGENTS.md)).
+**Qué pasa:** antes de abrir el PR haces el reto en frío con otro modelo y respondes cada hallazgo (regla 7 del [AGENTS.md](https://github.com/daniknn/lca425-estandar/blob/main/AGENTS.md)). El gate revisa que la sección `## Reto en frío` esté completa; con el gate en verde, mergeas tú. Daria califica la entrega después, sobre el PR mergeado.
 
 **Ejemplos:**
 - La entrega final de la pieza.
 - Material de terceros: una canción, un logo o una imagen que no hiciste tú.
-- Publicar la pieza en tu portafolio.
 
-**Quién decide:** Daria.
+**Quién decide:** tú mergeas; Daria califica después. Publicar la pieza fuera del aula, por ejemplo en tu portafolio, es [Permiso](#permiso).
 
 <a id="permiso"></a>
 ## Permiso

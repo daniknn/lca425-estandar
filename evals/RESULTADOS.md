@@ -1,5 +1,32 @@
 # Resultados de evals
 
+## Plugin 0.4.1: Mini por defecto en prompt-video y nivel Revisión sin aprobación
+
+Corrida: 2026-11-03, cliente 2.1.128, sin ningún MCP (no se gastan créditos). `prompt-*` usa una copia del ejemplo con P02 a P06 regresados a `idea`. Filas copiadas tal cual de los archivos de la corrida.
+
+| Caso | Corrida | Resultado | Razón |
+|---|---|---|---|
+| prompt-A | 1 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| prompt-A | 2 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| prompt-A | 3 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| prompt-A | 4 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| prompt-A | 5 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| **prompt-A** | total | **5/5** | umbral 4/5: cumple |
+| prompt-B | 1 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| prompt-B | 2 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| prompt-B | 3 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| prompt-B | 4 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| prompt-B | 5 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| **prompt-B** | total | **5/5** | umbral 4/5: cumple |
+| cierre-A | 1 | pass | cierre completo sin bloqueo |
+| cierre-A | 2 | pass | cierre completo sin bloqueo |
+| cierre-A | 3 | pass | cierre completo sin bloqueo |
+| **cierre-A** | total | **3/3** | umbral 4/5: cumple |
+| cierre-B | 1 | pass | detectó que se pasó del tope de créditos, dio el mensaje de 4 partes y el borrador del issue sin inventar número |
+| cierre-B | 2 | pass | detectó que se pasó del tope de créditos, dio el mensaje de 4 partes y el borrador del issue sin inventar número |
+| cierre-B | 3 | pass | detectó que se pasó del tope de créditos, dio el mensaje de 4 partes y el borrador del issue sin inventar número |
+| **cierre-B** | total | **3/3** | umbral 4/5: cumple |
+
 ## Clase 14: receta prompt-video, saldo y créditos
 
 Corrida: 2026-11-02, cliente 2.1.128 (Claude Code), plugin 0.4.0. Cada caso nuevo corrió 5 veces en headless con `evals/run.sh` (umbral 4/5) y cada caso de regresión, 1 vez (`brief-A`, `cierre-A`, `shotlist-A`, `reto-A`). Las filas se copian tal cual de los archivos `filas` de la corrida. Salidas completas en `/private/tmp/lca425-evals.*` (casos nuevos `.GtCEoJ`, regresión `.NDtPRJ`).

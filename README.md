@@ -16,3 +16,4 @@ En Claude Code:
 - [Reglas del curso](https://github.com/daniknn/lca425-estandar/blob/main/AGENTS.md)
 - [Niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#libre)
 - [Cómo trabajar](https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#tu-primer-pr)
+- [Rúbrica de la pieza audiovisual](https://github.com/daniknn/lca425-estandar/blob/main/docs/rubrica.md)

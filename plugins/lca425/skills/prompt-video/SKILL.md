@@ -57,6 +57,8 @@ El plano del shotlist (`03_shotlist/shotlist.yaml`) pasa por estos estados: `ide
 4. **Modelo.**
    - Con MCP: lista los modelos de video reales con `models_explore` (acción `list`, `type: video`) y muestra unos pocos con su ID. Si el plano ya trae `modelo`, pregunta si usan ese. El ID que escribes es el que devuelve la herramienta, no uno que recuerdes. Para los límites (duración, modos) usa la acción `get` del modelo elegido.
    - Sin MCP: pregunta una vez: "¿Qué modelo de video ves en la web de Higgsfield? Dime el nombre tal como aparece." Escribe exactamente eso.
+   - Sugerencia del curso (márcala como sugerencia; decide el alumno): el tope del curso es de 80 créditos, así que conviene **Seedance 2.0 Mini a 720p** (`seedance_2_0_mini`) o Seedance 2.0 fast a 480p, que cuestan 1 crédito por segundo y dejan margen para un reintento por plano. Con Seedance 2.0 fast a 720p (2.5 por segundo) solo alcanzan unos 32 s sin reintentos. Si hay MCP, confirma el precio con una cotización; no repitas estas cifras como hechos si la cotización dice otra cosa.
+   - Antes de cada plano, di cuánto le queda: `presupuesto_creditos` menos la suma de `costo_creditos` de `04_prompts/`, y cuántos segundos más alcanzan al precio del modelo elegido.
    - No propongas ni escribas un modelo que no salió de la herramienta o del alumno. Si el plano tiene `modelo` distinto al elegido, pregunta si lo actualizas; si estaba vacío, escribe el elegido.
 5. **Estilo.** Lee `04_prompts/estilo.md`. Si no existe, créalo con el alumno, con sus palabras: pregunta una cosa por turno (luz, paleta, lente, textura), arma el archivo con este formato, muéstraselo y escribe solo con su OK:
    ```
