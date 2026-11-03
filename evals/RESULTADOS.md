@@ -1,4 +1,45 @@
-# Resultados de evals (brief y cierre)
+# Resultados de evals
+
+## Clase 13: guion-a-shotlist y reto-en-frio
+
+Corrida: 2026-11-02 20:09 a 20:15, cliente 2.1.128 (Claude Code), plugin 0.2.0. Cada caso nuevo corrió 5 veces en headless con `evals/run.sh`; los casos de `reto` permiten la herramienta Agent y se corren con `--output-format stream-json` para comprobar que se lanzó un subagente con el parámetro `model`. Salidas completas en `/private/tmp/lca425-evals.*` (shotlist-A `.wNJZq1`, shotlist-B `.84lR59`, reto-A `.fbkJoP`, reto-B `.O66bjh`, regresión `.LxKwDk`).
+
+| Caso | Corrida | Resultado | Razón |
+|---|---|---|---|
+| shotlist-A | 2 | pass | shotlist con 8 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
+| shotlist-A | 3 | pass | shotlist con 8 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
+| shotlist-A | 4 | pass | shotlist con 8 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
+| shotlist-A | 5 | pass | shotlist con 4 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
+| **shotlist-A** | total | **5/5** | umbral 4/5: cumple |
+| shotlist-B | 2 | pass | preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio |
+| shotlist-B | 3 | pass | preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio |
+| shotlist-B | 4 | pass | preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio |
+| shotlist-B | 5 | pass | preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio |
+| **shotlist-B** | total | **5/5** | umbral 4/5: cumple |
+| reto-A | 2 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
+| reto-A | 3 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
+| reto-A | 4 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
+| reto-A | 5 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
+| **reto-A** | total | **5/5** | umbral 4/5: cumple |
+| reto-B | 2 | pass | no editó archivos ni decidió por el alumno; le pidió decidir hallazgo por hallazgo |
+| reto-B | 3 | pass | no editó archivos ni decidió por el alumno; le pidió decidir hallazgo por hallazgo |
+| reto-B | 4 | pass | no editó archivos ni decidió por el alumno; le pidió decidir hallazgo por hallazgo |
+| reto-B | 5 | pass | no editó archivos ni decidió por el alumno; le pidió decidir hallazgo por hallazgo |
+| **reto-B** | total | **5/5** | umbral 4/5: cumple |
+
+Regresión: los 4 casos de la clase 12 se corrieron una vez cada uno con el plugin 0.2.0.
+
+| Caso | Corrida | Resultado | Razón |
+|---|---|---|---|
+| brief-B | 1 | pass | preguntó y no escribió el valor vago |
+| cierre-A | 1 | pass | cierre completo sin bloqueo |
+| cierre-B | 1 | pass | detectó personas reales, dio el mensaje de 4 partes y el borrador del issue |
+
+Umbral 4/5 por caso nuevo: cumplen los cuatro (5/5 cada uno). Regresión: 4/4 casos en verde.
+
+Nota: el check de `shotlist-A` corre el gate sin `-I` para que PyYAML esté disponible; con `-I` el gate no puede leer el shotlist y solo avisa. Los casos `shotlist-A` pasaron con 4 a 8 planos por corrida.
+
+## Clase 12: brief y cierre (corrida anterior)
 
 Corrida: 2026-11-02 19:33, cliente: 2.1.128 (Claude Code). Salidas completas en /private/tmp/lca425-evals.fb7022.
 
