@@ -22,7 +22,7 @@ Entre cada etapa hay una decisión humana: tú o Daria dicen "sigue". Claude pro
 | Shotlist | `03_shotlist/` | ¿Cada plano tiene un propósito? |
 | Prompts y clips | `04_prompts/` y Drive | ¿Cada clip se validó y se anotó la lección? |
 | Reto en frío | PR | ¿Qué rompió otro modelo y qué cambias? |
-| Entrega | PR con nivel Revisión | ¿Daria aprueba? |
+| Entrega | PR con nivel Revisión | ¿El reto en frío está respondido y el gate en verde? |
 | Aprendizaje | issue o nota | ¿Qué falló y qué regla o tarjeta lo evita? |
 
 ## Los cuatro niveles
@@ -31,7 +31,7 @@ Cada cambio tiene un nivel. Lo declaras en el PR. Si dudas, el más alto.
 
 - **Libre**: mergeas tú con el gate en verde.
 - **Aviso**: mergeas con el gate en verde; Daria revisa en la clase siguiente.
-- **Revisión**: Daria aprueba el PR antes del merge.
+- **Revisión**: mergeas con el gate en verde, que exige el reto en frío respondido; Daria califica después.
 - **Permiso**: abres un issue de autorización antes de empezar. Solo para temas sensibles, pasarte del tope de créditos o publicar fuera del aula.
 
 Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#libre).

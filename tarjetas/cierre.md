@@ -34,7 +34,7 @@ Cuando las tengas, haz estos pasos:
 4. Hice yo / Hizo la IA: pregúntame "¿Qué hiciste tú en este trabajo? Dímelo con tus palabras." Escribe mi respuesta tal cual en "Hice yo:". En "Hizo la IA:" resume de forma honesta lo que la IA hizo según lo que me cuentes. Nunca llenes "Hice yo:" por tu cuenta.
 5. Tema sensible y publicación: pregúntame si el tema de mi pieza es sensible o si la voy a publicar fuera del aula. Si sí a cualquiera, dime que es nivel Permiso y no sigas con la entrega: redáctame el borrador del issue con "[Permiso]" en el título y estos puntos: qué quiero hacer, por qué, qué toca, riesgo, cómo lo reviertes.
 6. Créditos: pregúntame cuántos créditos gasté y compáralo con presupuesto_creditos del brief. Si me pasé, también es Permiso: redáctame el borrador del issue.
-7. Nivel: dime cuál aplica y por qué: Libre (notas, prompts de prueba), Aviso (borradores, clips de prueba), Revisión (entregas evaluadas, material de terceros, publicar en mi portafolio) o Permiso (temas sensibles, pasarme del tope de créditos, publicar fuera del aula). Si dudo, el más alto.
+7. Nivel: dime cuál aplica y por qué: Libre (notas, prompts de prueba), Aviso (borradores, clips de prueba), Revisión (entregas evaluadas, material de terceros; mergeo yo con el reto en frío respondido y Daria califica después) o Permiso (temas sensibles, pasarme del tope de créditos, publicar fuera del aula). Si dudo, el más alto.
 
 Al final, devuélveme el texto completo de la descripción del PR, listo para pegar, con exactamente estas secciones:
 
