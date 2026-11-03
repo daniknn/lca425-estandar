@@ -503,7 +503,9 @@ def revisar_shotlist(repo, brief, res, yamlc, escenas=None):
         else:
             vistos.add(pid)
 
-        faltan = [c for c in ("descripcion", "camara", "modelo") if not es_texto_util(p.get(c))]
+        # modelo puede faltar mientras el plano es solo una idea: el alumno aún no elige con qué generarlo.
+        requeridos = ("descripcion", "camara") if str(p.get("estado", "")).strip().lower() == "idea" else ("descripcion", "camara", "modelo")
+        faltan = [c for c in requeridos if not es_texto_util(p.get(c))]
         dur = p.get("duracion_s")
         if isinstance(dur, bool) or not isinstance(dur, (int, float)) or dur <= 0:
             faltan.append("duracion_s (número mayor que 0)")
@@ -947,11 +949,25 @@ def revisar_pr(cuerpo, res):
 
     # Reto en frío (solo nivel Revisión)
     if nivel_marcado == "revision":
-        hallazgos = []
+        hallazgos, sin_respuesta = [], []
         for linea in (secs.get("reto en frio") or "").splitlines():
+            if not re.match(r"^\s*[-*]\s*H\d+\s*:", linea):
+                continue
             m = RE_HALLAZGO.match(linea)
             if m and not es_placeholder(m.group(2)) and not es_placeholder(m.group(4)):
                 hallazgos.append(m.group(1))
+            else:
+                sin_respuesta.append(linea.strip()[:60])
+        if sin_respuesta:
+            res.falla(
+                "pr-reto-sin-respuesta", archivo,
+                "Estos hallazgos del reto en frío no tienen respuesta: %s." % "; ".join(sin_respuesta[:5]),
+                "Reto en frío · cada hallazgo se decide: lo incorporas o lo rechazas con una razón · "
+                + link("como-trabajar.md", "reto-en-frio"),
+                ["Agrega al final de cada línea `→ Incorporo: <qué cambiaste>` o `→ Rechazo: <tu razón>`.",
+                 "Si no sabes cómo responder uno, pregúntale a Daria en clase."],
+                "Responde cada hallazgo en la descripción del PR; el gate se vuelve a correr al guardarla.",
+            )
         if not hallazgos:
             falta = "reto en frio" not in secs
             res.falla(
@@ -964,7 +980,7 @@ def revisar_pr(cuerpo, res):
                 ["Corre /lca425:reto-en-frio en Claude Code, o usa la tarjeta `reto-en-frio` en claude.ai, y pega el bloque que te devuelve.",
                  "Escribe cada hallazgo en una línea: `- H1: <hallazgo> → Incorporo: <qué cambiaste>` o `- H1: <hallazgo> → Rechazo: <tu razón>`.",
                  "Si no sabes cómo responder un hallazgo, pregúntale a Daria en clase."],
-                "Pega la sección `## Reto en frío` con al menos un hallazgo respondido en la descripción del PR; el gate se vuelve a correr solo.",
+                "Pega la sección `## Reto en frío` con cada hallazgo respondido en la descripción del PR; el gate se vuelve a correr al guardarla.",
             )
 
     # Qué cambia
@@ -982,7 +998,7 @@ def revisar_pr(cuerpo, res):
                 + link("como-trabajar.md", "tu-primer-pr"),
                 ["Escribe una o dos oraciones con lo que agregaste o cambiaste.",
                  "Pídele a tu Claude que resuma el cambio y revisa que sea cierto."],
-                "Escribe qué cambia en la descripción del PR; el gate se vuelve a correr solo.",
+                "Escribe qué cambia en la descripción del PR; el gate se vuelve a correr al guardarla.",
             )
 
     # Uso de IA
@@ -1009,7 +1025,7 @@ def revisar_pr(cuerpo, res):
                 + link("como-trabajar.md", "tu-primer-pr"),
                 ["Escribe una línea en cada una, aunque sea corta.",
                  "Si la IA no hizo nada, escribe \"Nada\"; si no hiciste nada tú, es momento de hacer algo."],
-                "Completa las dos líneas en la descripción del PR; el gate se vuelve a correr solo.",
+                "Completa las dos líneas en la descripción del PR; el gate se vuelve a correr al guardarla.",
             )
 
     # Personas reales

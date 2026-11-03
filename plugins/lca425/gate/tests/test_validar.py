@@ -16,7 +16,7 @@ import validar
 
 VALIDAR = GATE / "validar.py"
 # Si el estándar vive junto a las plantillas (carpeta de trabajo local) se prueban también.
-HERMANOS = GATE.parents[1]
+HERMANOS = GATE.parents[3]  # carpeta que contiene lca425-estandar, proyecto-plantilla y proyecto-ejemplo
 
 
 def leer(nombre):
@@ -328,6 +328,23 @@ class TestShotlistClase13(Base):
         self.assertIn("P02", f["que_paso"])
         self.assertNotIn("P01", f["que_paso"])
 
+    def test_modelo_puede_faltar_en_estado_idea(self):
+        ruta = self.repo / "03_shotlist" / "shotlist.yaml"
+        texto = ruta.read_text(encoding="utf-8")
+        import re as _re
+        texto = _re.sub(r"(  - id: P02\n(?:    .*\n)*?)    modelo: .*\n", r"\1", texto, count=1)
+        texto = _re.sub(r"(  - id: P02\n(?:    .*\n)*?    estado: )\w+", r"\1idea", texto, count=1)
+        ruta.write_text(texto, encoding="utf-8")
+        self.assertNotIn("modelo", " ".join(f["que_paso"] for f in self.correr().fallas))
+
+    def test_modelo_se_exige_desde_estado_prompt(self):
+        ruta = self.repo / "03_shotlist" / "shotlist.yaml"
+        texto = ruta.read_text(encoding="utf-8")
+        import re as _re
+        texto = _re.sub(r"(  - id: P01\n(?:    .*\n)*?)    modelo: .*\n", r"\1", texto, count=1)
+        ruta.write_text(texto, encoding="utf-8")
+        self.assertFalla(self.correr(), "shotlist-campos")
+
     def test_escena_inexistente(self):
         self.superponer("shotlist-escena-inexistente")
         res = self.correr()
@@ -365,6 +382,18 @@ class TestRetoEnFrio(Base):
     def test_flecha_ascii_se_acepta(self):
         cuerpo = leer("revision-sin-reto.md") + "\n## Reto en frío\n\n- H1: Falta una escena. -> Rechazo: ya está cubierta.\n"
         self.assertEqual(self.correr(pr_body=cuerpo).fallas, [])
+
+    def test_un_hallazgo_sin_respuesta_falla_aunque_otro_este_completo(self):
+        cuerpo = leer("revision-sin-reto.md") + (
+            "\n## Reto en frío\n\n- H1: Falta una escena. → Incorporo: agregué ESC 4.\n"
+            "- H2: El plano P03 no tiene propósito claro.\n"
+            "- H3: Sobra un inserto. → Rechazo:   \n")
+        res = self.correr(pr_body=cuerpo)
+        self.assertFalla(res, "pr-reto-sin-respuesta")
+        f = next(f for f in res.fallas if f["regla"] == "pr-reto-sin-respuesta")
+        self.assertIn("H2", f["que_paso"])
+        self.assertIn("H3", f["que_paso"])
+        self.assertNotIn("H1", f["que_paso"])
 
     def test_aviso_sin_reto_pasa(self):
         self.assertEqual(self.correr(pr_body=leer("aviso-sin-reto.md")).fallas, [])

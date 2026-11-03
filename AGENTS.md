@@ -108,7 +108,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - **Cómo:** Pasa el material a otro modelo con este brief: "Rompe esto, no lo pules. Busca huecos, planos sin propósito y riesgos". Responde a cada hallazgo: lo incorporas o lo rechazas con una razón escrita. Usa la receta `reto-en-frio` o su tarjeta.
 - **Check:** El PR incluye la lista de hallazgos y tu respuesta a cada uno.
 - **Por qué:** Quien escribió algo es el peor revisor de eso mismo.
-- **Lo impone:** el gate exige la sección `## Reto en frío` en los PR de nivel Revisión, con al menos un hallazgo respondido. Cómo responder: [reto en frío](https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#reto-en-frio).
+- **Lo impone:** el gate exige la sección `## Reto en frío` en los PR de nivel Revisión, con cada hallazgo respondido. Cómo responder: [reto en frío](https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#reto-en-frio).
 
 ### 9. Sin secretos en el repo
 

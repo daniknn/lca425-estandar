@@ -91,7 +91,7 @@ El reto en frío es pedirle a **otro modelo** (distinto del que te ayudó a escr
 - H2: <hallazgo> → Rechazo: <tu razón>
 ```
 
-Lo que revisa el gate: que haya al menos un hallazgo con su respuesta y que después de `Incorporo:` o `Rechazo:` haya texto. No juzga si tu razón es buena; eso lo ve Daria al revisar.
+Lo que revisa el gate: que haya al menos un hallazgo, que cada línea `H<n>` tenga su respuesta y que después de `Incorporo:` o `Rechazo:` haya texto. Si corriges la descripción del PR, el gate vuelve a correr al guardarla. No juzga si tu razón es buena; eso lo ve Daria al revisar.
 
 Lo que no hace el reto: no revisa los clips (solo texto) y no cambia tus archivos. Si decides incorporar algo, el cambio lo haces tú o se lo pides aparte a Claude.
 

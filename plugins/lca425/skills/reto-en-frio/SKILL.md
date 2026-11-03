@@ -48,7 +48,7 @@ Objetivo: que el alumno encuentre los huecos de su material antes de que lo haga
    - H2: <hallazgo en una línea> → Rechazo: <su razón>
    ```
 
-   Recuérdale que el gate exige esa sección con al menos un hallazgo respondido cuando el PR es nivel Revisión, y que si puso "Incorporo" el cambio tiene que estar hecho cuando abra el PR. Explicación: [cómo responder los hallazgos](https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#reto-en-frio).
+   Recuérdale que el gate exige esa sección cuando el PR es nivel Revisión, con al menos un hallazgo y cada hallazgo respondido, y que si puso "Incorporo" el cambio tiene que estar hecho cuando abra el PR. Explicación: [cómo responder los hallazgos](https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#reto-en-frio).
 7. **Cierra** con una sola pregunta: "¿Quieres aplicar alguno de los cambios que dijiste que incorporas, o prefieres hacerlos tú?"
 
 ## Corridas de prueba (evals)

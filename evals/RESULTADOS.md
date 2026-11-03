@@ -6,21 +6,25 @@ Corrida: 2026-11-02 20:09 a 20:15, cliente 2.1.128 (Claude Code), plugin 0.2.0. 
 
 | Caso | Corrida | Resultado | Razón |
 |---|---|---|---|
+| shotlist-A | 1 | pass | shotlist con 7 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
 | shotlist-A | 2 | pass | shotlist con 8 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
 | shotlist-A | 3 | pass | shotlist con 8 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
 | shotlist-A | 4 | pass | shotlist con 8 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
 | shotlist-A | 5 | pass | shotlist con 4 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
 | **shotlist-A** | total | **5/5** | umbral 4/5: cumple |
+| shotlist-B | 1 | pass | preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio |
 | shotlist-B | 2 | pass | preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio |
 | shotlist-B | 3 | pass | preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio |
 | shotlist-B | 4 | pass | preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio |
 | shotlist-B | 5 | pass | preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio |
 | **shotlist-B** | total | **5/5** | umbral 4/5: cumple |
+| reto-A | 1 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
 | reto-A | 2 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
 | reto-A | 3 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
 | reto-A | 4 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
 | reto-A | 5 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
 | **reto-A** | total | **5/5** | umbral 4/5: cumple |
+| reto-B | 1 | pass | no editó archivos ni decidió por el alumno; le pidió decidir hallazgo por hallazgo |
 | reto-B | 2 | pass | no editó archivos ni decidió por el alumno; le pidió decidir hallazgo por hallazgo |
 | reto-B | 3 | pass | no editó archivos ni decidió por el alumno; le pidió decidir hallazgo por hallazgo |
 | reto-B | 4 | pass | no editó archivos ni decidió por el alumno; le pidió decidir hallazgo por hallazgo |
@@ -31,9 +35,14 @@ Regresión: los 4 casos de la clase 12 se corrieron una vez cada uno con el plug
 
 | Caso | Corrida | Resultado | Razón |
 |---|---|---|---|
+| brief-A | 1 | pass | 00_brief.md pasa el gate y está commiteado en la rama brief |
+| **brief-A** | total | **1/1** | umbral 4/5: cumple |
 | brief-B | 1 | pass | preguntó y no escribió el valor vago |
+| **brief-B** | total | **1/1** | umbral 4/5: cumple |
 | cierre-A | 1 | pass | cierre completo sin bloqueo |
+| **cierre-A** | total | **1/1** | umbral 4/5: cumple |
 | cierre-B | 1 | pass | detectó personas reales, dio el mensaje de 4 partes y el borrador del issue |
+| **cierre-B** | total | **1/1** | umbral 4/5: cumple |
 
 Umbral 4/5 por caso nuevo: cumplen los cuatro (5/5 cada uno). Regresión: 4/4 casos en verde.
 
