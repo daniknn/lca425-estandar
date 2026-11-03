@@ -1,7 +1,7 @@
 {
   "name": "lca425",
-  "version": "0.3.0",
-  "description": "Recetas (brief, guion-a-shotlist, reto-en-frio, cierre) y hooks de seguridad para el curso LCA425 de Amerike.",
+  "version": "0.4.0",
+  "description": "Recetas (brief, guion-a-shotlist, prompt-video, reto-en-frio, cierre) y hooks de seguridad (git y saldo de Higgsfield) para el curso LCA425 de Amerike.",
   "author": {
     "name": "Daria Nikitina"
   }

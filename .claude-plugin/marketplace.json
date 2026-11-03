@@ -8,7 +8,7 @@
     {
       "name": "lca425",
       "source": "./plugins/lca425",
-      "description": "Recetas y muros de seguridad para producir piezas audiovisuales con IA en LCA425 (Amerike): brief, cierre y hooks que protegen main."
+      "description": "Recetas y muros de seguridad para producir piezas audiovisuales con IA en LCA425 (Amerike): brief, guion, prompts de video, cierre y hooks que protegen main y tus créditos."
     }
   ]
 }

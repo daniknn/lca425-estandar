@@ -78,10 +78,10 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 
 - **Regla:** Fija un tope de créditos en el brief y no lo superes sin Permiso.
 - **Cuándo:** Al escribir el brief y antes de cada tanda de clips.
-- **Cómo:** Anota `presupuesto_creditos`. Antes de generar, revisa tu saldo y el costo. Si vas a pasarte, abre un issue de Permiso.
+- **Cómo:** Anota `presupuesto_creditos`. Antes de generar, revisa tu saldo y cotiza el costo (la receta `prompt-video` lo hace contigo) y guarda el `costo_creditos` real de cada clip en su archivo de `04_prompts/`. Si vas a pasarte, abre un issue de Permiso.
 - **Check:** El gasto real es menor o igual al tope, o hay un issue de Permiso que lo amplía.
 - **Por qué:** Los créditos son tuyos y se acaban; un clip mal pedido no se reembolsa.
-- **Lo impone:** el hook revisa que consultes el saldo antes de generar, desde la clase 14.
+- **Lo impone:** el gate suma los `costo_creditos` de `04_prompts/` y, si pasan del tope, el PR tiene que ser de nivel Permiso; el hook de saldo del plugin bloquea generar en Higgsfield sin consultar el saldo y cotizar antes. Ver "Estado de los muros".
 
 ### 6. Declara el uso de IA y acredita lo que no hiciste
 
@@ -141,6 +141,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - Pregunta antes de asumir. Si estás enseñando, una pregunta a la vez.
 - Antes de empezar cualquier cambio, clasifica su nivel (Libre, Aviso, Revisión o Permiso) y dilo en voz alta.
 - Pregunta si el cambio toca un tema sensible, te pasas del tope de créditos o la pieza saldrá del aula. Si la respuesta es sí, para y manda a abrir el issue de Permiso. Que salga alguien real, familiar o menor no es tema sensible ni motivo de Permiso.
+- Nunca generes en Higgsfield sin el saldo, la cotización y el sí claro del alumno. Un plano a la vez.
 - No edites archivos del gate ni de los hooks, ni los de configuración de permisos. No des rodeos a un bloqueo.
 - Antes de reportar avance, comprueba cada afirmación contra el resultado de una herramienta. Sin comprobación, di "por verificar".
 - Cuando algo se bloquee, explica las 4 partes con tus palabras y deja que el alumno elija.
@@ -151,8 +152,8 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 | Muro | Qué revisa | Estado |
 |---|---|---|
 | Protección de ramas en GitHub | Que nadie suba directo a `main` | **Disuasión, no muro**: tu repo vive en tu cuenta y Daria no puede bloquear pushes. Por eso la regla 2 la imponen los hooks del plugin y el gate revisa cada PR |
-| Gate (CI, fuera de tu repo) | Brief completo, estructura del repo, sin binarios, sin secretos, sin palabras prohibidas, formato del guion, `escena` y `proposito` en cada plano, secciones del PR (Nivel, Qué cambia, Uso de IA y, en Revisión, Reto en frío) | Activo en cada PR |
+| Gate (CI, fuera de tu repo) | Brief completo, estructura del repo, sin binarios, sin secretos, sin palabras prohibidas, formato del guion, `escena` y `proposito` en cada plano, `costo_creditos` en cada prompt con clip, suma de créditos contra tu tope (pasarte exige nivel Permiso), secciones del PR (Nivel, Qué cambia, Uso de IA y, en Revisión, Reto en frío) | Activo en cada PR |
 | Hooks del plugin | Push a `main`, `--force` y `--no-verify` | Activos con el plugin instalado |
-| Hook de saldo | Consultar saldo y costo antes de generar | Desde la clase 14 |
+| Hook de saldo | Que antes de cada generación en Higgsfield (video, imagen, audio) hayas consultado el saldo y cotizado el costo; si no puede comprobarlo, bloquea | Activo con el plugin instalado (desde la clase 14) |
 
 Los hooks solo existen si instalaste el plugin. Quien trabaja en GitHub web tiene el gate y a Daria como muro.
