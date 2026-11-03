@@ -72,6 +72,33 @@ NOMBRE: diálogo, si lo hay.
 - `escena`: el número de una escena que existe en tu guion (obligatorio cuando ya hay `guion.md`).
 - `proposito`: una frase sobre para qué sirve ese plano respecto de `que_debe_lograr` de tu brief (siempre obligatorio).
 
+<a id="creditos"></a>
+## Créditos: tu tope y cómo bajar el costo
+
+Tu brief fija un tope en `presupuesto_creditos`. Cada clip que generas gasta créditos de Higgsfield y no se reembolsan, así que el tope se cuida antes de generar, no después.
+
+**Cómo se cuenta.** Cada archivo de `04_prompts/` guarda el `costo_creditos` real de su clip (el que te mostró Higgsfield; si no hay otro dato, la cotización). El gate suma todos los archivos, también las versiones viejas (`P03-v1`, `P03-v2`), porque un clip regenerado ya gastó sus créditos. Si la suma pasa de tu tope:
+
+- En un PR, el nivel tiene que ser **Permiso**: abres un issue `[Permiso] ...` (la receta `/lca425:cierre` te lo redacta) y Daria decide si amplía tu tope.
+- En una corrida local, el gate solo te avisa.
+
+**Antes de generar** (la receta `/lca425:prompt-video` lo hace contigo, y el plugin lo exige):
+
+1. Mira tu saldo en Higgsfield.
+2. Pide la cotización del clip (Higgsfield dice cuánto costaría, sin generar nada).
+3. Compara con lo que te queda de tope: `presupuesto_creditos` menos lo ya gastado en `04_prompts/`.
+4. Genera solo si te alcanza y dices que sí.
+
+**Cómo bajar el costo de un clip:**
+
+- Menos duración: ¿de verdad necesitas 8 s o alcanzan 5? Confirma el efecto en la cotización de tu cuenta.
+- Menos resolución: prueba en 720p antes de pedir más, y compara las cotizaciones.
+- Un modo más barato, si tu modelo lo tiene. Ejemplo de una cotización real (5 s, 720p, sin audio, 16:9): `seedance_2_0` costó 22.5 créditos en modo std y 12.5 en modo fast. Los precios cambian: usa siempre la cotización de tu cuenta.
+- Sin audio, si el sonido lo vas a hacer aparte.
+- Menos intentos: afina el prompt en texto antes de generar y quita planos que no sirvan a `que_debe_lograr` de tu brief.
+
+Si aun así necesitas pasarte, es Permiso: [niveles](https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#permiso).
+
 <a id="reto-en-frio"></a>
 ## Reto en frío: cómo responder los hallazgos
 

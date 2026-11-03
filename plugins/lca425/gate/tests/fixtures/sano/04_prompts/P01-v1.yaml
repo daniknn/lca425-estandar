@@ -1,8 +1,14 @@
 id: P01-v1
-modelo: Seedance 2.0
+modelo: seedance_2_0
 prompt: Interior de un autobús vacío al amanecer, luz dorada sobre los asientos, plano fijo.
 parametros:
-  duracion_s: 5
+  duration: 5
+  resolution: 720p
+  aspect_ratio: "16:9"
+  generate_audio: false
+  mode: std
+job_id: fixture-job-p01
+costo_creditos: 22.5
 clip_url: https://drive.google.com/file/d/fixture-p01
 validado: si
 leccion: Funcionó mejor pedir una sola fuente de luz; con dos, el clip parpadeaba.
