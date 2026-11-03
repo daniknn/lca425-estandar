@@ -1,0 +1,27 @@
+name: CI del estándar
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar PyYAML
+        run: python3 -m pip install pyyaml==6.0.2
+      - name: Pruebas unitarias del gate
+        working-directory: plugins/lca425/gate
+        run: python3 -m unittest discover -s tests -v
+      - name: Palabras prohibidas sobre este repo
+        run: python3 plugins/lca425/gate/validar.py . --solo-palabras

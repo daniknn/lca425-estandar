@@ -1,0 +1,347 @@
+<title>Estudio LCA425</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: una columna de lectura (~68ch) con bandas a todo lo ancho; el calendario es una hoja de llamado.
+   Identidad del curso: claqueta (tinta, papel y cinta gaffer amarilla), rotulación condensada de slate. */
+:root {
+  --accent: #F5C518;      /* cinta gaffer */
+  --on-accent: #121214;
+  --mark: rgba(245,197,24,0.55);
+  --bg: #FAFAF7;          /* papel */
+  --bg-alt: #F0EFEA;
+  --card: #FFFFFF;
+  --tinted: #FFF4C2;
+  --fg: #2B2B30;          /* tinta */
+  --fg-strong: #121214;
+  --muted: #55555B;
+  --link: #121214;
+  --link-line: #D9A800;
+  --on-tinted: #3D3000;
+  --border: #DCDAD2;
+  --border-tinted: #E9C94A;
+  --nav: #121214;
+  --on-nav: #FAFAF7;
+  --warn-bg: #FFE3C7; --warn-fg: #6B3400;
+  --ok-bg: #D3EEDC; --ok-fg: #17553A;
+  --err-bg: #FBE3E3; --err-fg: #9A2525;
+  --code-bg: #121214; --code-fg: #F0EFEA;
+  --focus: 0 0 0 3px rgba(18,18,20,0.55);
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --r-sm: 6px; --r-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --mark: rgba(245,197,24,0.28);
+    --bg: #121214; --bg-alt: #1B1B1F; --card: #1B1B1F; --tinted: rgba(245,197,24,0.14);
+    --fg: #D9D8D2; --fg-strong: #FAFAF7; --muted: #A9A8A2; --link: #FAFAF7; --link-line: #F5C518; --on-tinted: #FFE28A;
+    --border: #2E2E34; --border-tinted: rgba(245,197,24,0.4); --nav: #0B0B0D;
+    --warn-bg: #3A2410; --warn-fg: #FFD8B0; --ok-bg: #12301F; --ok-fg: #C6E8D4; --err-bg: #3A1616; --err-fg: #FCD4D4;
+    --code-bg: #0B0B0D; --code-fg: #F0EFEA; --focus: 0 0 0 3px rgba(245,197,24,0.7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --mark: rgba(245,197,24,0.28);
+  --bg: #121214; --bg-alt: #1B1B1F; --card: #1B1B1F; --tinted: rgba(245,197,24,0.14);
+  --fg: #D9D8D2; --fg-strong: #FAFAF7; --muted: #A9A8A2; --link: #FAFAF7; --link-line: #F5C518; --on-tinted: #FFE28A;
+  --border: #2E2E34; --border-tinted: rgba(245,197,24,0.4); --nav: #0B0B0D;
+  --warn-bg: #3A2410; --warn-fg: #FFD8B0; --ok-bg: #12301F; --ok-fg: #C6E8D4; --err-bg: #3A1616; --err-fg: #FCD4D4;
+  --code-bg: #0B0B0D; --code-fg: #F0EFEA; --focus: 0 0 0 3px rgba(245,197,24,0.7);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 17px; line-height: 1.6; }
+a { color: var(--link); text-decoration-color: var(--link-line); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--link); }
+a:focus-visible, button:focus-visible { outline: none; box-shadow: var(--focus); border-radius: 4px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 78%; color: var(--fg-strong); text-wrap: balance; line-height: 1.08; margin: 0; letter-spacing: -0.005em; }
+h2 { font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.4rem); font-weight: 800; }
+h3 { font-size: 1.25rem; font-weight: 700; }
+p { margin: 0; }
+code, .mono { font-family: var(--f-mono); font-size: 0.88em; }
+:not(pre) > code { background: var(--tinted); color: var(--on-tinted); padding: 0.1em 0.35em; border-radius: 5px; }
+
+.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.read { max-width: 68ch; }
+section { padding-block: clamp(40px, 6vw, 72px); border-top: 1px solid var(--border); }
+section .wrap { display: grid; gap: 24px; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+/* Encabezado */
+header.top { background: var(--nav); color: var(--on-nav); }
+header.top .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; justify-content: space-between; padding-block: 14px; }
+header.top .brand { font-family: var(--f-mono); font-size: 0.82rem; letter-spacing: 0.06em; display: inline-flex; gap: 10px; align-items: center; }
+header.top .brand::before { content: ""; width: 26px; height: 14px; background: repeating-linear-gradient(-45deg, var(--accent) 0 5px, var(--nav) 5px 10px); border: 1px solid var(--accent); }
+header.top nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.92rem; }
+header.top nav a { color: var(--on-nav); text-decoration: none; padding-block: 10px; }
+header.top nav a:hover { text-decoration: underline; }
+
+/* Hero */
+.hero { padding-block: clamp(40px, 7vw, 88px) clamp(32px, 5vw, 56px); border-top: 0; }
+.hero h1 { font-size: clamp(2.6rem, 1.6rem + 5vw, 5rem); font-weight: 800; font-stretch: 70%; text-transform: uppercase; letter-spacing: 0; max-width: 14ch; }
+.hero h1 em { font-style: normal; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.hero .lede { font-size: 1.15rem; max-width: 56ch; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 8px; }
+.fact { border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px 18px; background: var(--card); display: grid; gap: 4px; }
+.fact b { font-family: var(--f-display); font-stretch: 70%; font-size: 2.2rem; color: var(--fg-strong); line-height: 1; }
+
+/* Hoja de llamado */
+.sheet-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r-lg); }
+table.sheet { width: 100%; border-collapse: collapse; min-width: 560px; font-size: 0.95rem; }
+table.sheet th, table.sheet td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.sheet thead th { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--bg-alt); }
+table.sheet tbody tr:last-child td { border-bottom: 0; }
+table.sheet td.cl { font-family: var(--f-mono); font-weight: 600; color: var(--fg-strong); white-space: nowrap; font-variant-numeric: tabular-nums; }
+table.sheet tr.now td { background: var(--tinted); }
+table.sheet tr.now td.cl { color: var(--on-tinted); }
+
+/* Ciclo */
+ol.cycle { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; counter-reset: st; }
+ol.cycle li { counter-increment: st; border: 1px solid var(--border-tinted); border-radius: 999px; padding: 6px 14px 6px 8px; display: flex; gap: 8px; align-items: center; background: var(--card); color: var(--fg-strong); font-weight: 500; }
+ol.cycle li::before { content: counter(st); font-family: var(--f-mono); font-size: 0.78rem; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-weight: 600; }
+
+/* Vías */
+.paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.path { border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; background: var(--card); display: grid; gap: 12px; align-content: start; min-width: 0; }
+.path .who { font-size: 0.92rem; color: var(--muted); }
+.path ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+
+/* Comandos */
+.cmd { position: relative; background: var(--code-bg); color: var(--code-fg); border-radius: var(--r-sm); min-width: 0; }
+.cmd pre { margin: 0; padding: 14px 16px; padding-right: 92px; overflow-x: auto; font-family: var(--f-mono); font-size: 0.86rem; line-height: 1.55; }
+.copy { position: absolute; top: 8px; right: 8px; min-height: 44px; min-width: 72px; border: 1px solid rgba(255,255,255,0.25); background: transparent; color: var(--code-fg); border-radius: var(--r-sm); font: 600 0.8rem var(--f-body); cursor: pointer; }
+.copy:hover { background: rgba(255,255,255,0.08); }
+
+/* Niveles */
+.levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.level { border-radius: var(--r-lg); padding: 18px; display: grid; gap: 8px; align-content: start; border: 1px solid var(--border); background: var(--card); }
+.pill { justify-self: start; font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; font-weight: 600; }
+.pill.libre { background: var(--ok-bg); color: var(--ok-fg); }
+.pill.aviso { background: var(--tinted); color: var(--on-tinted); }
+.pill.revision { background: var(--warn-bg); color: var(--warn-fg); }
+.pill.permiso { background: var(--err-bg); color: var(--err-fg); }
+.level .ej { font-size: 0.92rem; color: var(--muted); }
+
+/* Bloqueo */
+.block { border: 1px solid var(--border-tinted); background: var(--bg-alt); border-radius: var(--r-lg); padding: 18px 20px; display: grid; gap: 10px; font-size: 0.97rem; min-width: 0; }
+.block dt { font-weight: 700; color: var(--fg-strong); }
+.block dd { margin: 0 0 6px; }
+
+/* Reglas fijas */
+ul.never { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+ul.never li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
+ul.never svg { width: 22px; height: 22px; margin-top: 3px; stroke: var(--link); fill: none; stroke-width: 1.8; }
+
+.links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.links a { display: grid; gap: 2px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--r-sm); text-decoration: none; min-height: 44px; background: var(--card); }
+.links a span { color: var(--muted); font-size: 0.88rem; }
+.links a b { color: var(--fg-strong); text-decoration: underline; text-decoration-color: var(--link-line); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+footer { padding-block: 28px 40px; border-top: 1px solid var(--border); font-size: 0.88rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <span class="brand">LCA425 · AMERIKE · ESTUDIO</span>
+    <nav aria-label="Secciones">
+      <a href="#llamado">Calendario</a>
+      <a href="#via">Tu vía</a>
+      <a href="#primer-pr">Primer PR</a>
+      <a href="#niveles">Niveles</a>
+      <a href="#bloqueos">Bloqueos</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <h1>De la idea al plano, <em>con un PR</em> a la vez.</h1>
+      <p class="lede">Vas a producir una pieza audiovisual con IA (un corto, una serie para redes o una pieza transmedia) con un sistema que te pregunta antes de asumir, revisa tu trabajo en cada cambio y te dice por qué cuando algo se frena.</p>
+      <div class="facts">
+        <div class="fact"><b>4</b><span>niveles, de "lo mergeas tú" a "pide permiso antes"</span></div>
+        <div class="fact"><b>2</b><span>vías: Claude Code o claude.ai con GitHub web</span></div>
+        <div class="fact"><b>0</b><span>videos en el repo: la media vive en tu Drive</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="llamado">
+    <div class="wrap">
+      <span class="eyebrow">Hoja de llamado</span>
+      <h2>Qué se hace en cada clase</h2>
+      <p class="read">Cada etapa termina con una decisión tuya o de Daria. Claude propone; tú dices "sigue".</p>
+      <ol class="cycle" aria-label="Etapas del ciclo">
+        <li>Brief</li><li>Guion</li><li>Shotlist</li><li>Prompts y clips</li><li>Reto en frío</li><li>Entrega</li><li>Aprendizaje</li>
+      </ol>
+      <div class="sheet-scroll" role="region" aria-label="Calendario por clase" tabindex="0">
+        <table class="sheet">
+          <thead><tr><th scope="col">Clase</th><th scope="col">Etapa</th><th scope="col">Sales con</th><th scope="col">Receta</th></tr></thead>
+          <tbody>
+            <tr class="now"><td class="cl">CL 12</td><td>Arranque y brief</td><td>Tu repo, tu primer PR en verde y tu <code>00_brief.md</code></td><td><code>/lca425:brief</code></td></tr>
+            <tr><td class="cl">CL 13</td><td>Historia, guion y shotlist</td><td>Guion en <code>02_guion/</code>, planos en <code>shotlist.yaml</code>, primer reto en frío</td><td>Llega antes de la clase</td></tr>
+            <tr><td class="cl">CL 14</td><td>Prompts y clips</td><td>Prompts validados en <code>04_prompts/</code>, clips en Drive con su lección</td><td>Llega antes de la clase</td></tr>
+            <tr><td class="cl">CL 15</td><td>Montaje, audio y web</td><td>Link del montaje y notas de edición; la web con <code>/design</code> e Impeccable</td><td>Las que ya conoces</td></tr>
+            <tr><td class="cl">CL 16</td><td>Entrega</td><td>PR de nivel Revisión con el reto en frío resuelto</td><td><code>/lca425:cierre</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="via">
+    <div class="wrap">
+      <span class="eyebrow">Antes de empezar</span>
+      <h2>Elige tu vía</h2>
+      <p class="read">Las reglas son las mismas en las dos. Lo que cambia es quién hace los pasos de GitHub por ti. Si no sabes qué plan de Claude tienes, contesta el censo y Daria te dice cuál usar.</p>
+      <div class="paths">
+        <article class="path">
+          <h3>Vía A · Claude Code</h3>
+          <p class="who">Con plan Pro o Max de Claude.</p>
+          <p>Claude crea la rama, escribe el archivo y abre el PR. Además, el plugin del curso frena a tiempo lo que no debe pasar, como subir directo a <code>main</code>.</p>
+          <p>La primera vez, en la Terminal:</p>
+          <div class="cmd"><pre>claude update</pre><button class="copy" type="button" aria-label="Copiar: claude update">Copiar</button></div>
+          <p>Luego, dentro de Claude Code:</p>
+          <div class="cmd"><pre>/plugin marketplace add daniknn/lca425-estandar
+/plugin install lca425@lca425</pre><button class="copy" type="button" aria-label="Copiar comandos de instalación del plugin">Copiar</button></div>
+          <p>Al inicio de cada clase:</p>
+          <div class="cmd"><pre>/plugin marketplace update lca425
+/reload-plugins</pre><button class="copy" type="button" aria-label="Copiar comandos de actualización">Copiar</button></div>
+        </article>
+        <article class="path">
+          <h3>Vía B · claude.ai y GitHub web</h3>
+          <p class="who">Con cualquier plan de Claude, incluso el gratis.</p>
+          <p>Usas las tarjetas del curso: cada una es un prompt que pegas en claude.ai. Te devuelve el texto y tú lo pegas en GitHub desde el navegador.</p>
+          <p>El gate revisa tu PR igual que en la vía A. Lo que no tienes es el aviso previo del plugin, así que pon atención en un punto: al guardar en GitHub, elige siempre <b>"Create a new branch"</b>.</p>
+          <p><a href="https://github.com/daniknn/lca425-estandar/tree/main/tarjetas">Ver las tarjetas</a></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="primer-pr">
+    <div class="wrap">
+      <span class="eyebrow">Clase 12</span>
+      <h2>Tu primer PR: el brief</h2>
+      <p class="read">Un PR es una propuesta de cambio. La haces en una rama, el gate la revisa y, si sale en verde, la mergeas. El brief responde dos preguntas antes de generar cualquier cosa: qué tiene que lograr la pieza y en quién.</p>
+      <div class="path">
+        <h3>Antes: crea tu repo (una sola vez)</h3>
+        <ol>
+          <li>Abre la <a href="https://github.com/daniknn/proyecto-plantilla">plantilla del proyecto</a> y pulsa <b>Use this template → Create a new repository</b>.</li>
+          <li>Nómbralo <code>lca425-tu-usuario</code> y elige <b>Private</b>.</li>
+          <li>En <b>Settings → Collaborators</b>, invita a <code>daniknn</code> para que Daria vea y revise tu trabajo.</li>
+        </ol>
+      </div>
+      <div class="paths">
+        <div class="path">
+          <h3>Con Claude Code</h3>
+          <ol>
+            <li>Abre tu repo en Claude Code.</li>
+            <li>Escribe <code>/lca425:brief</code> y contesta una pregunta a la vez.</li>
+            <li>Cuando te pregunte qué hiciste tú, contesta con tus palabras. Claude no lo escribe por ti.</li>
+            <li>Claude abre el PR. Espera la marca verde y mergea.</li>
+          </ol>
+        </div>
+        <div class="path">
+          <h3>Con claude.ai y GitHub web</h3>
+          <ol>
+            <li>Pega la tarjeta <code>brief</code> en claude.ai y contesta.</li>
+            <li>En GitHub abre <code>00_brief.md</code>, pulsa el lápiz y pega el texto.</li>
+            <li>Guarda con <b>"Create a new branch"</b> y abre el PR.</li>
+            <li>Llena las cuatro secciones del PR, espera la marca verde y mergea.</li>
+          </ol>
+        </div>
+      </div>
+      <p class="read">El brief es nivel <b>Aviso</b>: lo mergeas tú con el gate en verde y Daria lo revisa en la clase siguiente. Paso a paso completo: <a href="https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#tu-primer-pr">cómo trabajar</a>.</p>
+    </div>
+  </section>
+
+  <section id="niveles">
+    <div class="wrap">
+      <span class="eyebrow">Cada cambio tiene un nivel</span>
+      <h2>Los cuatro niveles</h2>
+      <p class="read">Lo declaras en cada PR. Si dudas entre dos niveles, elige el más alto.</p>
+      <div class="levels">
+        <div class="level"><span class="pill libre">Libre</span><p>Lo mergeas tú con el gate en verde.</p><p class="ej">Notas, prompts de prueba.</p></div>
+        <div class="level"><span class="pill aviso">Aviso</span><p>Lo mergeas tú; Daria lo revisa en la clase siguiente.</p><p class="ej">Brief, borrador de guion, shotlist, clips de prueba.</p></div>
+        <div class="level"><span class="pill revision">Revisión</span><p>Daria aprueba el PR antes del merge.</p><p class="ej">Entregas que se califican, material de terceros.</p></div>
+        <div class="level"><span class="pill permiso">Permiso</span><p>Abres un issue <code>[Permiso]</code> antes de empezar.</p><p class="ej">La cara o la voz de una persona real (también en parodia), menores, temas sensibles, pasarte del tope de créditos, publicar fuera del aula.</p></div>
+      </div>
+      <p class="read">Detalle y más ejemplos: <a href="https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#libre">niveles</a> y <a href="https://github.com/daniknn/lca425-estandar/blob/main/docs/etica-y-derechos.md#personas-reales">ética y derechos</a>.</p>
+    </div>
+  </section>
+
+  <section id="bloqueos">
+    <div class="wrap">
+      <span class="eyebrow">Cuando algo se frena</span>
+      <h2>Un bloqueo te dice qué hacer</h2>
+      <p class="read">El gate, el plugin y Claude te avisan siempre con el mismo formato de cuatro partes. Ejemplo real: intentaste subir directo a <code>main</code>.</p>
+      <dl class="block">
+        <dt>✋ Qué pasó</dt><dd>Intentaste subir cambios directo a <code>main</code>.</dd>
+        <dt>Por qué</dt><dd>Cada cambio entra por un PR para que el gate lo revise y se pueda deshacer.</dd>
+        <dt>Qué puedes hacer</dt><dd>1. Crear una rama y abrir un PR. 2. Pedirle a Claude que lo haga por ti. 3. Preguntarle a Daria si no estás segura o seguro.</dd>
+        <dt>Cómo destrabar</dt><dd>Elige la opción 1 o la 2. No busques otro comando para lograr lo mismo.</dd>
+      </dl>
+      <p class="read">Si ninguna opción te sirve, abre un issue y copia el mensaje del bloqueo. Más en <a href="https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#bloqueos">cuando algo se bloquea</a>.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <span class="eyebrow">Sin excepción</span>
+      <h2>Cuatro cosas que nunca cambian</h2>
+      <ul class="never read">
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg><span><b>La media va a Drive.</b> Videos, audios y proyectos de edición nunca entran al repo; en <code>clip_url</code> pegas el link. Si ya subiste uno por error: <a href="https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#binario-subido">qué hacer</a>.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span><b>Personas reales: primero el Permiso.</b> Compañeros, familia o figuras públicas, también en parodia. Una cara o una voz que ya circula no se puede regresar.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/><path d="M17 15l4 4M21 15l-4 4"/></svg><span><b>Declaras qué hizo la IA y qué hiciste tú.</b> En cada PR. Se evalúa tu criterio.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><span><b>Sin llaves ni contraseñas en el repo.</b> Si se te coló una, avisa a Daria de inmediato: hay que revocarla, borrarla no basta.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <span class="eyebrow">Para leer completo</span>
+      <h2>Las reglas, en su lugar</h2>
+      <p class="read">Esta guía resume. Si algo aquí no coincide con estos documentos, valen los documentos.</p>
+      <div class="links">
+        <a href="https://github.com/daniknn/lca425-estandar/blob/main/AGENTS.md"><b>Estándar del curso</b><span>Las 12 reglas y para qué sirve cada una</span></a>
+        <a href="https://github.com/daniknn/lca425-estandar/blob/main/docs/niveles.md#libre"><b>Niveles</b><span>Ejemplos y cómo pedir Permiso</span></a>
+        <a href="https://github.com/daniknn/lca425-estandar/blob/main/docs/etica-y-derechos.md#personas-reales"><b>Ética y derechos</b><span>Personas reales, menores, música y marcas</span></a>
+        <a href="https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#tu-primer-pr"><b>Cómo trabajar</b><span>Ramas, PR y bloqueos, paso a paso</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>LCA425 · Tecnología y Creación Web · Amerike.</p>
+    <p>Sistema y guía diseñados por Daria Nikitina.</p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var pre = btn.parentElement.querySelector('pre');
+    var text = pre.textContent;
+    var done = function (label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copiar'; }, 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done('Copiado'); }, function () { selectText(pre); done('Selecciona'); });
+    } else { selectText(pre); done('Selecciona'); }
+  });
+});
+function selectText(el) {
+  var r = document.createRange(); r.selectNodeContents(el);
+  var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+</script>

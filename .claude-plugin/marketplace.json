@@ -1,0 +1,14 @@
+{
+  "name": "lca425",
+  "description": "Plugin del curso LCA425 (Amerike): recetas y muros de seguridad para producir con IA.",
+  "owner": {
+    "name": "Daria Nikitina"
+  },
+  "plugins": [
+    {
+      "name": "lca425",
+      "source": "./plugins/lca425",
+      "description": "Recetas y muros de seguridad para producir piezas audiovisuales con IA en LCA425 (Amerike): brief, cierre y hooks que protegen main y las herramientas de riesgo."
+    }
+  ]
+}

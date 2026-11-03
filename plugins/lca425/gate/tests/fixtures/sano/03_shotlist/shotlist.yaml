@@ -1,0 +1,18 @@
+planos:
+  - id: P01
+    descripcion: Interior de un autobús vacío con luz de amanecer.
+    duracion_s: 5
+    camara: plano fijo a la altura de los asientos
+    modelo: Seedance 2.0
+    prompt_id: P01-v1
+    clip_url: https://drive.google.com/file/d/fixture-p01
+    estado: validado
+    persona_real: no
+  - id: P02
+    descripcion: Una bufanda olvidada en un asiento.
+    duracion_s: 3
+    camara: acercamiento lento
+    modelo: Seedance 2.0
+    prompt_id: P02-v1
+    estado: prompt
+    persona_real: no

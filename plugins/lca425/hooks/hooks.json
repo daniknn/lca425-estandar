@@ -1,0 +1,27 @@
+{
+  "description": "Muros del curso LCA425: protege main y bloquea las herramientas de riesgo de Higgsfield hasta que exista un Permiso.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/proteger-git.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "^mcp__.*__(create_voice|create_voice_from_confirmed_audio|voice_change|dubbing|build_ai_influencer|ai_influencer_generate|media_upload|media_import_url|tiktok_prepare_publish|tiktok_connect|publish_project|publish_website|deploy_website|participate_in_contest)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/riesgo-higgsfield.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

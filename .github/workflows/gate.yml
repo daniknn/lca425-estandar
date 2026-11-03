@@ -1,0 +1,87 @@
+name: Gate LCA425
+
+on:
+  workflow_call:
+    inputs:
+      estandar_ref:
+        description: Tag o rama de lca425-estandar con el validador
+        type: string
+        default: v1
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout del repo que llama
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # El estándar va a una carpeta con nombre impredecible y luego se mueve fuera
+      # del repo, para que el validador no lo escanee ni un repo pueda esconder archivos.
+      - name: Checkout del estándar
+        uses: actions/checkout@v4
+        with:
+          repository: daniknn/lca425-estandar
+          ref: ${{ inputs.estandar_ref }}
+          path: .estandar-${{ github.run_id }}
+          persist-credentials: false
+
+      - name: Mover el estándar fuera del repo
+        env:
+          RUN_ID: ${{ github.run_id }}
+        run: mv "$GITHUB_WORKSPACE/.estandar-$RUN_ID" "$RUNNER_TEMP/estandar"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar PyYAML
+        run: python3 -m pip install pyyaml==6.0.2
+
+      - name: Validar estructura, media, palabras y PR
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          # El modo lo decide este workflow, no el repo que llama: un alumno no puede relajarlo.
+          MODO: ${{ github.repository == 'daniknn/proyecto-plantilla' && 'plantilla' || 'alumno' }}
+        run: |
+          set -eu
+          case "$MODO" in alumno|plantilla) ;; *) echo "modo no válido: $MODO"; exit 2 ;; esac
+          VALIDAR="$RUNNER_TEMP/estandar/plugins/lca425/gate/validar.py"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr_body.md"
+            python3 "$VALIDAR" "$GITHUB_WORKSPACE" --modo "$MODO" --pr-body "$RUNNER_TEMP/pr_body.md"
+          else
+            python3 "$VALIDAR" "$GITHUB_WORKSPACE" --modo "$MODO"
+          fi
+
+      - name: Gitleaks (secretos)
+        if: ${{ !cancelled() }}
+        env:
+          GITLEAKS_VERSION: "8.30.1"
+          GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+        run: |
+          set -eu
+          cd "$RUNNER_TEMP"
+          curl -sSfL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+          mkdir gitleaks-bin
+          tar -xzf gitleaks.tar.gz -C gitleaks-bin gitleaks
+          if ! ./gitleaks-bin/gitleaks git --redact --no-banner "$GITHUB_WORKSPACE"; then
+            echo "✋ Qué pasó: gitleaks encontró algo que parece una llave, contraseña o token en tu repo."
+            echo "Por qué: Secretos · una llave subida a GitHub queda en el historial y hay que darla por perdida · https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#bloqueos"
+            echo "Qué puedes hacer:"
+            echo "  1. Quita el valor del archivo que indica el reporte de arriba."
+            echo "  2. Cambia o revoca esa llave en el servicio donde la creaste, aunque la borres del repo."
+            echo "  3. Pídele ayuda a Daria si no sabes dónde se creó."
+            echo "Cómo destrabar: revoca la llave, quítala del archivo y sube el cambio; no la pegues en el chat de nadie."
+            exit 1
+          fi
