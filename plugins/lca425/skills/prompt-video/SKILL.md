@@ -47,7 +47,7 @@ El plano del shotlist (`03_shotlist/shotlist.yaml`) pasa por estos estados: `ide
 - Busca herramientas cuyo nombre **termine** en `balance`, `models_explore` y `generate_video` (la forma es `mcp__<servidor>__balance`; el nombre del servidor cambia por cuenta, a veces es un código largo). Si aparecen como herramientas diferidas, cárgalas con la herramienta de búsqueda de herramientas antes de usarlas.
 - Si no están, trabajas **sin MCP**: el alumno genera en la web de Higgsfield y te cuenta.
 - Cotizar es pedir `generate_video` con `params.get_cost: true`: devuelve el costo en créditos y no envía nada. Solo con `get_cost` en `true` es una cotización.
-- Un hook del plugin bloquea cualquier generación real (`generate_video`, `generate_image`, `generate_audio` y sus `_batch`) si después de la última generación no hubo `balance` y una cotización. Si salta, no busques otra vía: explica el mensaje de 4 partes y haz lo que pide.
+- Un hook del plugin bloquea cualquier herramienta de Higgsfield que gaste créditos (generaciones, `upscale_*`, presets, `reframe`, voz y demás) si después del último gasto no hubo `balance` y, cuando la herramienta acepta `get_cost`, una cotización. Si salta, no busques otra vía: explica el mensaje de 4 partes y haz lo que pide.
 
 ## Pasos
 

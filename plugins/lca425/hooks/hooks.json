@@ -1,5 +1,5 @@
 {
-  "description": "Muros del curso LCA425: protege main, bloquea force push y --no-verify, y exige saldo y cotización antes de generar en Higgsfield.",
+  "description": "Muros del curso LCA425: protege main, bloquea force push y --no-verify, y exige saldo (y cotización cuando se puede) antes de gastar créditos en Higgsfield.",
   "hooks": {
     "PreToolUse": [
       {
@@ -13,7 +13,7 @@
         ]
       },
       {
-        "matcher": "^mcp__.*__generate_(video|image|audio)(_batch)?$",
+        "matcher": "^mcp__.*__(generate_(video|image|audio|3d)(_batch)?|execute_preset|upscale_(image|video)|outpaint_image|remove_background|reframe|ads_studio_generate|ai_influencer_generate|build_ai_influencer|shorts_studio_create|scene_builder_3d_generate_(video|angles)|motion_control|dubbing|voice_change|create_voice(_from_confirmed_audio)?|apps_invoke)$",
         "hooks": [
           {
             "type": "command",

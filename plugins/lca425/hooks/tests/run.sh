@@ -121,10 +121,35 @@ esperar "saldo: sin transcript_path bloqueado"             2 $S '{"tool_name":"m
 esperar "saldo: entrada ilegible bloqueada"                2 $S 'basura que no es json'
 esperar "saldo: balance no se bloquea"                     0 $S "$(printf '{"tool_name":"%s__balance","tool_input":{}}' "$SRV")"
 esperar "saldo: models_explore no se bloquea"              0 $S "$(printf '{"tool_name":"%s__models_explore","tool_input":{"action":"list","type":"video"}}' "$SRV")"
-esperar "saldo: otra herramienta MCP no se bloquea"        0 $S "$(printf '{"tool_name":"mcp__otro__scene_builder_3d_generate_video","tool_input":{}}')"
+esperar "saldo: otra herramienta MCP no se bloquea"        0 $S "$(printf '{"tool_name":"%s__show_generations","tool_input":{}}' "$SRV")"
+esperar "saldo: scene_builder_3d_generate_video sin saldo bloqueado" 2 $S "$(printf '{"transcript_path":"%s","tool_name":"mcp__otro__scene_builder_3d_generate_video","tool_input":{}}' "$T")"
 esperar "saldo: Bash no se bloquea"                        0 $S "$(bash_json 'ls' '/')"
 # un prompt que cita "get_cost":true entre comillas escapadas no es una cotización
 esperar "saldo: prompt con get_cost citado no es cotización" 2 $S "$(printf '{"transcript_path":"%s","tool_name":"%s__generate_video","tool_input":{"params":{"prompt":"pon \\"get_cost\\":true"}}}' "$T" "$SRV")"
+
+# ---- herramientas que gastan créditos además de generate_* (ampliación del hook)
+otro_json() { # $1 herramienta, $2 transcript_path, $3 tool_input JSON
+  printf '{"session_id":"s","transcript_path":"%s","tool_name":"%s__%s","tool_input":%s,"tool_use_id":"toolu_actual"}' "$2" "$SRV" "$1" "$3"
+}
+UPV='{"params":{"provider":"topaz","video_id":"11111111-1111-4111-8111-111111111111"}}'
+T13=$(nuevo_tr upscaleTrasSaldo); usar "$(tu 1 balance "$BAL")" "$T13"
+T14=$(nuevo_tr upscaleRepetido); cp "$T13" "$T14"; usar "$(tu 2 upscale_video "$UPV")" "$T14"
+T15=$(nuevo_tr adsCotizado); usar "$(tu 1 balance "$BAL")" "$T15"; usar "$(tu 2 ads_studio_quote '{}')" "$T15"
+T16=$(nuevo_tr adsPrimeraLlamada); usar "$(tu 1 balance "$BAL")" "$T16"; usar "$(tu 2 ads_studio_generate '{"idempotency_key":"k","total":1}')" "$T16"
+esperar "saldo: upscale_video sin saldo bloqueado"          2 $S "$(otro_json upscale_video "$T" "$UPV")"
+esperar "saldo: upscale_video (no cotizable) con saldo pasa" 0 $S "$(otro_json upscale_video "$T13" "$UPV")"
+esperar "saldo: upscale_video repetido sin saldo nuevo bloqueado" 2 $S "$(otro_json upscale_video "$T14" "$UPV")"
+esperar "saldo: execute_preset con saldo pasa"              0 $S "$(otro_json execute_preset "$T13" '{"source":"viral","preset_id":"x","inputs":{}}')"
+esperar "saldo: execute_preset sin saldo bloqueado"         2 $S "$(otro_json execute_preset "$T" '{"source":"viral","preset_id":"x","inputs":{}}')"
+esperar "saldo: generate_3d cotizable solo con saldo bloqueado" 2 $S "$(otro_json generate_3d "$T13" '{"params":{"model":"image_to_3d"}}')"
+esperar "saldo: generate_3d cotización pasa"                0 $S "$(otro_json generate_3d "$T" '{"params":{"model":"image_to_3d","get_cost":true}}')"
+esperar "saldo: upscale_image con saldo y sin cotizar bloqueado" 2 $S "$(otro_json upscale_image "$T13" '{"params":{"image_id":"x","width":1,"height":1}}')"
+esperar "saldo: shorts_studio_create get_cost arriba pasa"  0 $S "$(otro_json shorts_studio_create "$T" '{"get_cost":true,"duration_seconds":10}')"
+esperar "saldo: ads_studio_generate sin expected_credits pasa" 0 $S "$(otro_json ads_studio_generate "$T" '{"idempotency_key":"k","total":1}')"
+esperar "saldo: ads_studio_generate con expected_credits sin saldo bloqueado" 2 $S "$(otro_json ads_studio_generate "$T" '{"idempotency_key":"k","total":1,"expected_credits":20}')"
+esperar "saldo: ads_studio_generate tras saldo y ads_studio_quote pasa" 0 $S "$(otro_json ads_studio_generate "$T15" '{"idempotency_key":"k","total":1,"expected_credits":20}')"
+esperar "saldo: ads_studio_generate tras saldo y su primera llamada pasa" 0 $S "$(otro_json ads_studio_generate "$T16" '{"idempotency_key":"k","total":1,"expected_credits":20}')"
+esperar "saldo: remove_background sin saldo bloqueado"      2 $S "$(otro_json remove_background "$T" '{"params":{"media_id":"x","media_type":"image"}}')"
 
 # El mensaje de bloqueo tiene las 4 partes y el link del doc.
 for parte in "Qué pasó:" "Por qué:" "Qué puedes hacer:" "Cómo destrabar:" "como-trabajar.md#tu-primer-pr"; do
@@ -137,8 +162,8 @@ for parte in "Qué pasó:" "Por qué:" "Qué puedes hacer:" "Cómo destrabar:" "
     *) fail=$((fail + 1)); printf 'FAIL mensaje de saldo sin "%s"\n' "$parte" ;; esac
 done
 
-# hooks.json: el matcher de saldo apunta al script y cubre solo generate_*.
-if grep -q 'saldo-higgsfield.sh' "$HOOKS/hooks.json" && grep -q '\^mcp__\.\*__generate_(video|image|audio)(_batch)?\$' "$HOOKS/hooks.json"; then
+# hooks.json: el matcher de saldo apunta al script y cubre las herramientas que gastan créditos.
+if grep -q 'saldo-higgsfield.sh' "$HOOKS/hooks.json" && grep -q 'generate_(video|image|audio|3d)(_batch)?|execute_preset|upscale_(image|video)' "$HOOKS/hooks.json"; then
   pass=$((pass + 1)); printf 'ok   hooks.json registra el hook de saldo con su matcher\n'
 else fail=$((fail + 1)); printf 'FAIL hooks.json no registra el hook de saldo con su matcher\n'; fi
 
