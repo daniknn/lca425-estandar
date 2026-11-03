@@ -105,9 +105,10 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 
 - **Regla:** Antes de una entrega de nivel Revisión, pide a un modelo distinto al que escribió el material que intente romperlo.
 - **Cuándo:** Después de tener guion y shotlist, y otra vez antes de la entrega final.
-- **Cómo:** Pasa el material a otro modelo con este brief: "Rompe esto, no lo pules. Busca huecos, planos sin propósito y riesgos". Responde a cada hallazgo: lo incorporas o lo rechazas con una razón escrita. Usa la receta `cierre` o su tarjeta.
+- **Cómo:** Pasa el material a otro modelo con este brief: "Rompe esto, no lo pules. Busca huecos, planos sin propósito y riesgos". Responde a cada hallazgo: lo incorporas o lo rechazas con una razón escrita. Usa la receta `reto-en-frio` o su tarjeta.
 - **Check:** El PR incluye la lista de hallazgos y tu respuesta a cada uno.
 - **Por qué:** Quien escribió algo es el peor revisor de eso mismo.
+- **Lo impone:** el gate exige la sección `## Reto en frío` en los PR de nivel Revisión, con cada hallazgo respondido. Cómo responder: [reto en frío](https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#reto-en-frio).
 
 ### 9. Sin secretos en el repo
 
@@ -159,7 +160,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 | Muro | Qué revisa | Estado |
 |---|---|---|
 | Protección de ramas en GitHub | Que nadie suba directo a `main` | **Disuasión, no muro**: tu repo vive en tu cuenta y Daria no puede bloquear pushes. Por eso la regla 2 la imponen los hooks del plugin y el gate revisa cada PR |
-| Gate (CI, fuera de tu repo) | Brief completo, estructura del repo, sin binarios, sin secretos, sin palabras prohibidas, secciones del PR (Nivel, Qué cambia, Uso de IA, Personas reales) | Activo en cada PR |
+| Gate (CI, fuera de tu repo) | Brief completo, estructura del repo, sin binarios, sin secretos, sin palabras prohibidas, formato del guion, `escena` y `proposito` en cada plano, secciones del PR (Nivel, Qué cambia, Uso de IA, Personas reales y, en Revisión, Reto en frío) | Activo en cada PR |
 | Hooks del plugin | Push a `main`, `--force` y `--no-verify` | Activos con el plugin instalado |
 | Hooks de Higgsfield | Herramientas de riesgo (voces, doblaje, influencers, subir o importar media, publicar) | Activos con el plugin instalado |
 | Hook de saldo | Consultar saldo y costo antes de generar | Desde la clase 14 |

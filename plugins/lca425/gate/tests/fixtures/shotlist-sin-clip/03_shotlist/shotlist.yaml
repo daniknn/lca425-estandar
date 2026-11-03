@@ -1,5 +1,7 @@
 planos:
   - id: P01
+    escena: 1
+    proposito: Establece el autobús vacío y la luz del amanecer.
     descripcion: Interior de un autobús vacío con luz de amanecer.
     duracion_s: 5
     camara: plano fijo a la altura de los asientos
@@ -8,6 +10,8 @@ planos:
     estado: generado
     persona_real: no
   - id: P02
+    escena: 2
+    proposito: Da el objeto que la persona puede nombrar al terminar.
     descripcion: Una bufanda olvidada en un asiento.
     duracion_s: 3
     camara: acercamiento lento

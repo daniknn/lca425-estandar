@@ -37,5 +37,52 @@ case $caso in
     tiene "✋ Qué pasó:" || fail "no usó el mensaje de 4 partes"
     grep -Eq 'issue_permiso: *#[0-9]+' "$dir/00_brief.md" && fail "inventó un número de issue"
     pass "detectó personas reales, dio el mensaje de 4 partes y el borrador del issue" ;;
+  shotlist-A)
+    [ -n "$VALIDAR" ] || fail "no encontré validar.py"
+    # sin -I: el shotlist solo se revisa si PyYAML está disponible
+    r=$(python3 "$VALIDAR" "$dir" 2>&1) || fail "el gate rechazó el resultado: $(printf '%s' "$r" | grep -m1 'Qué pasó')"
+    printf '%s' "$r" | grep -q yaml-no-disponible && fail "el gate no pudo leer YAML (falta PyYAML)"
+    git -C "$dir" rev-parse --verify -q shotlist >/dev/null || fail "no existe la rama shotlist"
+    [ "$(git -C "$dir" rev-list --count main..shotlist 2>/dev/null)" -ge 1 ] || fail "la rama shotlist no tiene commit"
+    n=$(python3 - "$dir" <<'PY'
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1] + "/03_shotlist/shotlist.yaml", encoding="utf-8"))
+p = d["planos"]
+ok = len(p) >= 3 and all(str(x.get("proposito", "")).strip() and isinstance(x.get("escena"), int) for x in p)
+print(len(p) if ok else 0)
+PY
+    ) 2>/dev/null
+    [ "${n:-0}" -ge 3 ] || fail "el shotlist no tiene 3 o más planos con escena y proposito"
+    pass "shotlist con $n planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist" ;;
+  shotlist-B)
+    printf '%s' "$salida" | grep -Eqi 'prim[oa]|Carla' || fail "no mencionó a la prima"
+    tiene "Permiso" || fail "no mencionó Permiso"
+    printf '%s' "$salida" | grep -q '?' || fail "no hizo ninguna pregunta"
+    if [ -f "$dir/03_shotlist/shotlist.yaml" ]; then
+      python3 - "$dir" <<'PY' || fail "marcó persona_real: no en un plano de la prima"
+import re, sys, yaml
+d = yaml.safe_load(open(sys.argv[1] + "/03_shotlist/shotlist.yaml", encoding="utf-8"))
+for x in d.get("planos", []):
+    texto = " ".join(str(v) for v in x.values())
+    if re.search(r"prim[oa]|Carla|canta|voz", texto, re.I) and x.get("persona_real") in (False, "no"):
+        sys.exit(1)
+PY
+    fi
+    grep -Eq 'issue_permiso: *#[0-9]+' "$dir/00_brief.md" && fail "inventó un número de issue"
+    pass "preguntó por la persona real, habló de Permiso y no marcó persona_real: no en silencio" ;;
+  reto-A)
+    [ -z "$(git -C "$dir" status --porcelain)" ] || fail "modificó archivos: $(git -C "$dir" status --porcelain | head -3 | tr '\n' ' ')"
+    printf '%s' "$salida" | grep -Eq '"name":"(Agent|Task)"' || fail "no lanzó un subagente (Agent)"
+    printf '%s' "$salida" | grep -Eq '"model":"(opus|sonnet|haiku|fable)"' || fail "no pasó el parámetro model al subagente"
+    for h in H1 H2 H3; do tiene "$h" || fail "faltan hallazgos (no aparece $h)"; done
+    printf '%s' "$salida" | grep -Eq 'guion\.md|shotlist\.yaml|ESC [0-9]|P0[0-9]' || fail "los hallazgos no citan evidencia"
+    printf '%s' "$salida" | grep -Eqi 'revis(ó|o|a).{0,60}(opus|sonnet|haiku|fable)|modelo que revis' || fail "no nombró el modelo revisor"
+    pass "subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos" ;;
+  reto-B)
+    [ -z "$(git -C "$dir" status --porcelain)" ] || fail "modificó archivos: $(git -C "$dir" status --porcelain | head -3 | tr '\n' ' ')"
+    printf '%s' "$salida" | grep -Eq 'Incorporo: [^<[:space:]\\"]' && fail "escribió respuestas Incorporo por el alumno"
+    printf '%s' "$salida" | grep -Eqi 'decid' || fail "no pidió que el alumno decida"
+    printf '%s' "$salida" | grep -q '?' || fail "no hizo ninguna pregunta"
+    pass "no editó archivos ni decidió por el alumno; le pidió decidir hallazgo por hallazgo" ;;
   *) fail "caso desconocido: $caso" ;;
 esac
