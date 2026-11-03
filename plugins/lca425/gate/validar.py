@@ -11,6 +11,7 @@ Sale con 0 si no hay fallas y con 1 si hay al menos una.
 import argparse
 import hashlib
 import json
+import math
 import os
 import re
 import sys
@@ -594,18 +595,32 @@ def revisar_shotlist(repo, brief, res, yamlc, escenas=None):
         res.areas["shotlist"] = "funciona"
 
 
+def es_costo(valor):
+    """Número finito >= 0 (no booleano)."""
+    return (isinstance(valor, (int, float)) and not isinstance(valor, bool)
+            and math.isfinite(valor) and valor >= 0)
+
+
+def formato_creditos(n):
+    return ("%.2f" % n).rstrip("0").rstrip(".") if isinstance(n, float) else str(n)
+
+
 def revisar_prompts(repo, res, yamlc):
+    """Revisa 04_prompts/*.yaml. Devuelve {archivo: costo_creditos} de los archivos con costo válido
+    (todas las versiones cuentan: un clip que ya se generó ya gastó sus créditos), o None si no se
+    pudieron leer los YAML."""
     carpeta = repo / "04_prompts"
     archivos = sorted(carpeta.glob("*.yaml")) if carpeta.is_dir() else []
+    costos = {}
     if not archivos:
-        return
+        return costos
     todos_validados = True
     for ruta in archivos:
         rel = "04_prompts/" + ruta.name
         datos, estado = yamlc.cargar(ruta, rel)
         if estado == "sin_yaml":
             res.areas["prompts"] = "borrador"
-            return
+            return None
         if estado.startswith("invalido"):
             yaml_invalido(res, rel, "prompts", estado[len("invalido"):])
             continue
@@ -643,6 +658,40 @@ def revisar_prompts(repo, res, yamlc):
                 "Corrige los campos y sube el cambio.",
                 area="prompts",
             )
+        # Créditos (desde la clase 14): costo_creditos es obligatorio cuando ya hay clip.
+        clip_presente = es_texto_util(datos.get("clip_url"))
+        costo = datos.get("costo_creditos")
+        if es_costo(costo):
+            costos[rel] = costo
+        elif clip_presente or costo is not None:
+            if costo is None:
+                que = "En %s hay clip_url pero falta costo_creditos." % ruta.name
+            else:
+                que = "En %s costo_creditos debe ser un número de 0 o más; encontré `%s`." % (ruta.name, costo)
+            res.falla(
+                "prompt-costo", rel, que,
+                "Tope de créditos · el gate suma el costo de cada clip para compararlo con tu tope y no "
+                "puede hacerlo sin ese número · " + link("como-trabajar.md", "creditos"),
+                ["Escribe en `costo_creditos` el costo que te mostró Higgsfield (por ejemplo 22.5).",
+                 "Si no lo viste, búscalo en el historial de tu cuenta de Higgsfield; no lo adivines.",
+                 "Si todavía no generas el clip, quita `clip_url` hasta tenerlo."],
+                "Agrega el número real en `costo_creditos` y sube el cambio.",
+                area="prompts",
+            )
+        job = datos.get("job_id")
+        if "job_id" in datos and job is not None and (
+                isinstance(job, bool) or not isinstance(job, (str, int)) or es_placeholder(str(job))):
+            res.falla(
+                "prompt-job-id", rel,
+                "En %s el job_id debe ser el ID de la generación en Higgsfield, o no estar." % ruta.name,
+                "Prompts · el job_id sirve para encontrar el clip original en Higgsfield · "
+                + link("como-trabajar.md", "tu-primer-pr"),
+                ["Pega el ID que te dio Higgsfield al generar.",
+                 "Si no lo tienes, quita la línea `job_id`: es opcional."],
+                "Corrige o quita `job_id` y sube el cambio.",
+                area="prompts",
+            )
+
         if validado != "si":
             todos_validados = False
         else:
@@ -668,6 +717,73 @@ def revisar_prompts(repo, res, yamlc):
         res.areas["prompts"] = "borrador"
     else:
         res.areas["prompts"] = "funciona"
+    return costos
+
+
+RE_VERSION = re.compile(r"^(P\d{2})-v(\d+)$")
+
+
+def revisar_versiones(repo, res):
+    """Aviso (no falla) si un plano apunta a una versión de prompt más vieja que otra que existe."""
+    ruta = repo / "03_shotlist" / "shotlist.yaml"
+    carpeta = repo / "04_prompts"
+    if not ruta.is_file() or not carpeta.is_dir():
+        return
+    try:
+        import yaml
+        with open(ruta, "r", encoding="utf-8") as fh:
+            datos = yaml.safe_load(fh)
+    except Exception:
+        return
+    planos = datos.get("planos") if isinstance(datos, dict) else None
+    if not isinstance(planos, list):
+        return
+    for p in planos:
+        if not isinstance(p, dict) or not isinstance(p.get("prompt_id"), str):
+            continue
+        m = RE_VERSION.match(p["prompt_id"])
+        if not m:
+            continue
+        mayor = max([int(x.group(2)) for f in carpeta.glob(m.group(1) + "-v*.yaml")
+                     for x in [RE_VERSION.match(f.stem)] if x] or [0])
+        if mayor > int(m.group(2)):
+            res.aviso("prompt-version-vieja", "03_shotlist/shotlist.yaml",
+                      "El plano %s apunta a %s, pero existe %s-v%d. El shotlist debe apuntar a la versión vigente." % (
+                          p.get("id"), p["prompt_id"], m.group(1), mayor))
+
+
+def revisar_creditos(costos, brief, nivel, hay_pr, res):
+    """Suma costo_creditos de 04_prompts/ y la compara con presupuesto_creditos del brief.
+    Pasarse exige nivel Permiso en el PR; sin cuerpo de PR (corrida local) solo avisa."""
+    if not costos:
+        return
+    presupuesto = (brief or {}).get("presupuesto_creditos")
+    if es_placeholder(presupuesto) or not re.fullmatch(r"\d+", presupuesto.strip()):
+        return  # el brief ya falla por su cuenta
+    tope = int(presupuesto.strip())
+    total = sum(costos.values())
+    if total <= tope + 1e-9:
+        return
+    exceso = formato_creditos(round(total - tope, 2))
+    resumen = "%s créditos en total y tu brief fija un tope de %d (te pasaste por %s)" % (
+        formato_creditos(round(total, 2)), tope, exceso)
+    if not hay_pr:
+        res.aviso("creditos-excedidos", "04_prompts/",
+                  "Los clips suman " + resumen + ". En un PR esto exige nivel Permiso.")
+        return
+    if nivel is None or nivel == "permiso":
+        return  # sin nivel claro ya falla pr-nivel; con Permiso el PR está en regla
+    res.falla(
+        "creditos-excedidos", "04_prompts/",
+        "Los costo_creditos de 04_prompts/ suman %s." % resumen,
+        "Tope de créditos · pasarte del tope sin Permiso gasta créditos que no se reembolsan · "
+        + link("como-trabajar.md", "creditos"),
+        ["Baja el costo: menos resolución o menos duración en los clips que falten.",
+         "Usa un modo más barato (por ejemplo el modo fast, si tu modelo lo tiene) o quita planos.",
+         "Si de verdad necesitas pasarte, marca nivel Permiso en el PR y pídele a Daria que amplíe tu tope."],
+        "Marca el nivel Permiso en el PR y abre el issue de permiso (la receta /lca425:cierre te lo redacta), "
+        "o baja el gasto y sube el cambio.",
+    )
 
 
 # ---------------------------------------------------------------- media
@@ -965,6 +1081,7 @@ def revisar_pr(cuerpo, res):
                  "Si la IA no hizo nada, escribe \"Nada\"; si no hiciste nada tú, es momento de hacer algo."],
                 "Completa las dos líneas en la descripción del PR; el gate se vuelve a correr al guardarla.",
             )
+    return nivel_marcado
 
 
 # ---------------------------------------------------------------- orquestación
@@ -980,11 +1097,14 @@ def ejecutar(repo_path, modo="alumno", pr_body=None, solo_palabras=False):
     brief = revisar_brief(repo, modo, res)
     escenas = revisar_guion(repo, res)
     revisar_shotlist(repo, brief, res, yamlc, escenas)
-    revisar_prompts(repo, res, yamlc)
+    costos = revisar_prompts(repo, res, yamlc)
+    revisar_versiones(repo, res)
     revisar_media(repo, res)
     revisar_palabras(repo, res)
+    nivel = None
     if pr_body is not None:
-        revisar_pr(pr_body, res)
+        nivel = revisar_pr(pr_body, res)
+    revisar_creditos(costos, brief, nivel, pr_body is not None, res)
 
     # areas
     if (repo / "00_brief.md").is_file():

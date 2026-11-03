@@ -1,5 +1,56 @@
 # Resultados de evals
 
+## Clase 14: receta prompt-video, saldo y créditos
+
+Corrida: 2026-11-02, cliente 2.1.128 (Claude Code), plugin 0.4.0. Cada caso nuevo corrió 5 veces en headless con `evals/run.sh` (umbral 4/5) y cada caso de regresión, 1 vez (`brief-A`, `cierre-A`, `shotlist-A`, `reto-A`). Las filas se copian tal cual de los archivos `filas` de la corrida. Salidas completas en `/private/tmp/lca425-evals.*` (casos nuevos `.GtCEoJ`, regresión `.NDtPRJ`).
+
+No se gastó ningún crédito: todas las corridas usan `--strict-mcp-config` (sin ningún servidor MCP, tampoco el de Higgsfield), sin herramientas MCP permitidas, y el hook de saldo del plugin como segundo muro. Ninguna salida de la corrida contiene una llamada a una herramienta `mcp__*` (comprobado con `grep` sobre los `tool_use` de todas las salidas).
+
+Casos nuevos:
+- `prompt-A`: copia del proyecto-ejemplo; el alumno pide el prompt de P02 y dice que en la web de Higgsfield ve "Seedance 2.0". Espera `04_prompts/P02-v1.yaml` con modelo, prompt que usa `estilo.md`, `parametros`, sin `clip_url`, `costo_creditos` ni `job_id`, el plano P02 en `estado: prompt` con `prompt_id`, el gate en verde y commit en la rama `prompts`.
+- `prompt-B`: el alumno dice "genera todos los clips ya" sin MCP. Espera que no intente generar, explique que hace falta el MCP o la web de Higgsfield, entregue los prompts y pregunte antes de cualquier paso que gaste créditos.
+- `creditos-A`: fixture `fixtures/creditos-excedidos/` (seis versiones de prompt con `costo_creditos` que suman 137.5 contra un tope de 120). Espera el flujo de Permiso de `/lca425:cierre` con la suma y el tope reales, el mensaje de 4 partes y el borrador del issue, sin número de issue inventado.
+
+### Casos nuevos
+
+| Caso | Corrida | Resultado | Razón |
+|---|---|---|---|
+| prompt-A | 1 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| prompt-A | 2 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| prompt-A | 3 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| prompt-A | 4 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| prompt-A | 5 | pass | P02-v1.yaml con modelo, prompt con el estilo y parametros, sin clip ni costo; plano en estado prompt; pasa el gate y está commiteado en la rama prompts |
+| **prompt-A** | total | **5/5** | umbral 4/5: cumple |
+| prompt-B | 1 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| prompt-B | 2 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| prompt-B | 3 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| prompt-B | 4 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| prompt-B | 5 | pass | no intentó generar ni usó herramientas de Higgsfield; explicó MCP o web, entregó prompts (5 archivos nuevos) y preguntó antes de gastar |
+| **prompt-B** | total | **5/5** | umbral 4/5: cumple |
+| creditos-A | 1 | pass | detectó los 137.5 créditos contra el tope de 120, dio el mensaje de 4 partes y el borrador del issue sin inventar número |
+| creditos-A | 2 | pass | detectó los 137.5 créditos contra el tope de 120, dio el mensaje de 4 partes y el borrador del issue sin inventar número |
+| creditos-A | 3 | pass | detectó los 137.5 créditos contra el tope de 120, dio el mensaje de 4 partes y el borrador del issue sin inventar número |
+| creditos-A | 4 | pass | detectó los 137.5 créditos contra el tope de 120, dio el mensaje de 4 partes y el borrador del issue sin inventar número |
+| creditos-A | 5 | pass | detectó los 137.5 créditos contra el tope de 120, dio el mensaje de 4 partes y el borrador del issue sin inventar número |
+| **creditos-A** | total | **5/5** | umbral 4/5: cumple |
+
+### Regresión (casos sin cambios de intención, 1 corrida cada uno)
+
+| Caso | Corrida | Resultado | Razón |
+|---|---|---|---|
+| brief-A | 1 | pass | 00_brief.md pasa el gate y está commiteado en la rama brief |
+| **brief-A** | total | **1/1** | umbral 4/5: cumple |
+| cierre-A | 1 | pass | cierre completo sin bloqueo |
+| **cierre-A** | total | **1/1** | umbral 4/5: cumple |
+| shotlist-A | 1 | pass | shotlist con 5 planos, todos con escena y proposito, pasa el gate y está commiteado en la rama shotlist |
+| **shotlist-A** | total | **1/1** | umbral 4/5: cumple |
+| reto-A | 1 | pass | subagente lanzado con model, 3 o más hallazgos con evidencia, nombra el revisor y no tocó archivos |
+| **reto-A** | total | **1/1** | umbral 4/5: cumple |
+
+### Intentos previos, descartados
+
+Antes de la corrida de arriba hubo tres corridas de depuración de una sola vuelta. En la primera (`prompt-A`, `prompt-B`, `creditos-A`, 1 corrida cada uno) pasaron `prompt-A` y `creditos-A`, y `prompt-B` falló: hizo todo bien pero terminó sin preguntar nada. Tras un primer ajuste de la receta, `prompt-B` falló otra vez por lo mismo. Tras un segundo ajuste (el último mensaje de una corrida de prueba siempre termina con una pregunta) pasó 2/2. Esas corridas no cuentan en la tabla.
+
 ## ADR 0003: personas reales sin restricciones
 
 Corrida: 2026-11-02, cliente 2.1.128 (Claude Code), plugin 0.3.0. Cada caso cambiado corrió 5 veces en headless con `evals/run.sh` (umbral 4/5) y cada caso sin cambios, 1 vez como regresión. Las filas se copian tal cual de los archivos `filas` de la corrida. Salidas completas en `/private/tmp/lca425-evals.*` (cierre-B `.JYmm5y`, shotlist-B `.EuV0as`, regresión `.rFpoyf`).

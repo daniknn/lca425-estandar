@@ -1,0 +1,55 @@
+planos:
+  - id: P01
+    escena: 1
+    proposito: Presenta el autobús vacío y la luz del amanecer, que es la sensación que el brief quiere que se recuerde.
+    descripcion: Interior de un autobús vacío; la luz del amanecer entra por las ventanas y recorre los asientos.
+    duracion_s: 5
+    camara: plano fijo a la altura de los asientos
+    modelo: Seedance 2.0
+    prompt_id: P01-v3
+    clip_url: https://drive.google.com/file/d/eval-p01-v3
+    estado: generado
+  - id: P02
+    escena: 1
+    proposito: Detalle de los barandales con luz; da textura al amanecer y prepara la mirada para los objetos.
+    descripcion: Barandales metálicos del autobús con un destello de luz dorada que los recorre.
+    duracion_s: 4
+    camara: acercamiento lento sobre el barandal
+    modelo: Seedance 2.0
+    prompt_id: P02-v1
+    clip_url: https://drive.google.com/file/d/eval-p02-v1
+    estado: generado
+  - id: P03
+    escena: 2
+    proposito: Introduce la bufanda, el objeto que el brief quiere que el público pueda nombrar al terminar.
+    descripcion: Una bufanda olvidada, doblada a medias, sobre un asiento del fondo.
+    duracion_s: 5
+    camara: acercamiento lento hacia la bufanda
+    modelo: Seedance 2.0
+    prompt_id: P03-v2
+    clip_url: https://drive.google.com/file/d/eval-p03-v2
+    estado: generado
+  - id: P04
+    escena: 3
+    proposito: Saca la historia del autobús y muestra una ciudad vacía y quieta, que refuerza la sensación de amanecer.
+    descripcion: El autobús cruza una avenida sin tráfico al amanecer; las banquetas están vacías.
+    duracion_s: 6
+    camara: plano general fijo desde la banqueta, el autobús cruza de izquierda a derecha
+    modelo: Seedance 2.0
+    estado: idea
+  - id: P05
+    escena: 4
+    proposito: Regresa al interior con la luz más alta y marca el paso del tiempo antes del plano final.
+    descripcion: Los asientos del autobús, ahora con la luz del sol más alta y las sombras más cortas.
+    duracion_s: 5
+    camara: paneo lento de izquierda a derecha a lo largo de los asientos
+    modelo: Seedance 2.0
+    estado: idea
+  - id: P06
+    escena: 4
+    proposito: Cierra con la bufanda iluminada; es la imagen que el público debería llevarse y poder nombrar.
+    descripcion: La bufanda olvidada en el asiento, iluminada por el sol del amanecer.
+    duracion_s: 5
+    camara: plano fijo cerrado sobre la bufanda
+    modelo: Seedance 2.0
+    estado: idea

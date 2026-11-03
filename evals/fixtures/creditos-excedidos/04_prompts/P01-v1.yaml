@@ -1,0 +1,13 @@
+id: P01-v1
+modelo: seedance_2_0
+prompt: Plano de prueba P01-v1 del autobús al amanecer, luz dorada y suave, sin personas.
+parametros:
+  duration: 5
+  resolution: 720p
+  aspect_ratio: "16:9"
+  generate_audio: false
+  mode: std
+job_id: eval-job-p01-v1
+costo_creditos: 22.5
+clip_url: https://drive.google.com/file/d/eval-p01-v1
+validado: no

@@ -417,6 +417,157 @@ class TestRetoEnFrio(Base):
         self.assertFalla(self.correr(pr_body=cuerpo), "pr-reto-en-frio")
 
 
+class TestCreditosClase14(Base):
+    """Campos nuevos de 04_prompts/ y la regla de créditos (suma contra presupuesto_creditos)."""
+
+    def prompt(self, nombre, costo=None, clip=True, extra=""):
+        lineas = ["id: %s" % nombre, "modelo: seedance_2_0", "prompt: Plano de prueba de un autobús vacío.",
+                  "parametros:", "  duration: 5", "  resolution: 720p"]
+        if clip:
+            lineas.append("clip_url: https://drive.google.com/file/d/fixture-%s" % nombre)
+        if costo is not None:
+            lineas.append("costo_creditos: %s" % costo)
+        lineas.append("validado: no")
+        self.escribir("04_prompts/%s.yaml" % nombre, "\n".join(lineas) + "\n" + extra)
+
+    def permiso(self):
+        return leer("permiso.md")
+
+    # costo_creditos
+    def test_clip_sin_costo_falla(self):
+        self.prompt("P02-v1", costo=None, clip=True)
+        res = self.correr()
+        self.assertFalla(res, "prompt-costo")
+        f = next(f for f in res.fallas if f["regla"] == "prompt-costo")
+        self.assertIn("costo_creditos", f["que_paso"])
+        self.assertIn("como-trabajar.md#creditos", f["por_que"])
+
+    def test_costo_negativo_falla(self):
+        self.prompt("P02-v1", costo=-5)
+        self.assertFalla(self.correr(), "prompt-costo")
+
+    def test_costo_texto_falla(self):
+        self.prompt("P02-v1", costo='"veinte"')
+        self.assertFalla(self.correr(), "prompt-costo")
+
+    def test_costo_booleano_falla(self):
+        self.prompt("P02-v1", costo="true")
+        self.assertFalla(self.correr(), "prompt-costo")
+
+    def test_costo_invalido_falla_aunque_no_haya_clip(self):
+        self.prompt("P02-v1", costo=-1, clip=False)
+        self.assertFalla(self.correr(), "prompt-costo")
+
+    def test_sin_clip_el_costo_es_opcional(self):
+        self.prompt("P02-v1", costo=None, clip=False)
+        res = self.correr()
+        self.assertEqual(res.fallas, [], [f["que_paso"] for f in res.fallas])
+
+    def test_costo_cero_y_decimal_pasan(self):
+        self.prompt("P02-v1", costo=0)
+        self.assertEqual(self.correr().fallas, [])
+        self.prompt("P02-v1", costo=12.5)
+        self.assertEqual(self.correr().fallas, [])
+
+    # job_id y versiones
+    def test_job_id_es_opcional_y_valido_pasa(self):
+        self.prompt("P02-v1", costo=12.5, extra="job_id: 3f2b9c7e-aaaa-bbbb-cccc-1234567890ab\n")
+        self.assertEqual(self.correr().fallas, [])
+
+    def test_job_id_invalido_falla(self):
+        self.prompt("P02-v1", costo=12.5, extra="job_id: [a, b]\n")
+        self.assertFalla(self.correr(), "prompt-job-id")
+
+    def test_job_id_placeholder_falla(self):
+        self.prompt("P02-v1", costo=12.5, extra="job_id: TODO\n")
+        self.assertFalla(self.correr(), "prompt-job-id")
+
+    def test_version_nueva_es_otro_archivo_y_el_shotlist_vigente_pasa(self):
+        self.prompt("P02-v2", costo=12.5)
+        ruta = self.repo / "03_shotlist" / "shotlist.yaml"
+        ruta.write_text(ruta.read_text(encoding="utf-8").replace("prompt_id: P02-v1", "prompt_id: P02-v2"),
+                        encoding="utf-8")
+        res = self.correr()
+        self.assertEqual(res.fallas, [], [f["que_paso"] for f in res.fallas])
+        self.assertEqual(res.avisos, [])
+
+    def test_shotlist_apunta_a_version_vieja_avisa(self):
+        self.prompt("P02-v2", costo=12.5)  # el shotlist sigue apuntando a P02-v1
+        res = self.correr()
+        self.assertEqual(res.fallas, [])
+        self.assertIn("prompt-version-vieja", [a["regla"] for a in res.avisos])
+
+    # regla de créditos
+    def test_dentro_del_tope_con_pr_aviso_pasa(self):
+        self.prompt("P02-v1", costo=50)  # 22.5 (P01) + 50 = 72.5 de 120
+        self.assertEqual(self.correr(pr_body=leer("bueno.md")).fallas, [])
+
+    def test_justo_en_el_tope_pasa(self):
+        self.prompt("P02-v1", costo=97.5)  # 22.5 + 97.5 = 120
+        self.assertEqual(self.correr(pr_body=leer("bueno.md")).fallas, [])
+
+    def test_pasarse_con_pr_aviso_falla(self):
+        self.prompt("P02-v1", costo=100)  # 122.5 de 120
+        res = self.correr(pr_body=leer("bueno.md"))
+        self.assertFalla(res, "creditos-excedidos")
+        f = next(f for f in res.fallas if f["regla"] == "creditos-excedidos")
+        self.assertIn("122.5", f["que_paso"])
+        self.assertIn("120", f["que_paso"])
+        self.assertIn("como-trabajar.md#creditos", f["por_que"])
+        self.assertIn("Permiso", f["como_destrabar"])
+        self.assertGreaterEqual(len(f["opciones"]), 3)
+
+    def test_pasarse_con_pr_permiso_pasa(self):
+        self.prompt("P02-v1", costo=100)
+        res = self.correr(pr_body=self.permiso())
+        self.assertEqual(res.fallas, [], [f["que_paso"] for f in res.fallas])
+
+    def test_pasarse_sin_pr_solo_avisa(self):
+        self.prompt("P02-v1", costo=100)
+        res = self.correr()
+        self.assertEqual(res.fallas, [])
+        self.assertIn("creditos-excedidos", [a["regla"] for a in res.avisos])
+
+    def test_pasarse_con_pr_sin_nivel_falla_solo_por_el_nivel(self):
+        self.prompt("P02-v1", costo=100)
+        res = self.correr(pr_body=leer("bueno.md").replace("- [x] Aviso", "- [ ] Aviso"))
+        self.assertIn("pr-nivel", self.reglas(res))
+        self.assertNotIn("creditos-excedidos", self.reglas(res))
+
+    def test_la_suma_cuenta_todas_las_versiones(self):
+        self.prompt("P02-v1", costo=50)
+        self.prompt("P02-v2", costo=50)  # 22.5 + 50 + 50 = 122.5
+        self.assertFalla(self.correr(pr_body=leer("bueno.md")), "creditos-excedidos")
+
+    def test_clip_sin_costo_no_cuenta_como_cero_en_silencio(self):
+        self.prompt("P02-v1", costo=None, clip=True)
+        res = self.correr(pr_body=leer("bueno.md"))
+        self.assertIn("prompt-costo", self.reglas(res))
+
+    def test_brief_sin_presupuesto_valido_no_dispara_la_regla(self):
+        brief = self.repo / "00_brief.md"
+        brief.write_text(brief.read_text(encoding="utf-8").replace("presupuesto_creditos: 120", "presupuesto_creditos: mucho"),
+                         encoding="utf-8")
+        self.prompt("P02-v1", costo=500)
+        res = self.correr(pr_body=leer("bueno.md"))
+        self.assertIn("brief-presupuesto", self.reglas(res))
+        self.assertNotIn("creditos-excedidos", self.reglas(res))
+
+    def test_el_doc_tiene_el_ancla_creditos(self):
+        doc = GATE.parents[2] / "docs" / "como-trabajar.md"
+        self.assertIn('<a id="creditos"></a>', doc.read_text(encoding="utf-8"))
+
+    def test_cli_pasarse_sale_con_1_y_mensaje_de_4_partes(self):
+        self.prompt("P02-v1", costo=100)
+        cuerpo = self.repo.parent / "pr.md"
+        cuerpo.write_text(leer("bueno.md"), encoding="utf-8")
+        p = subprocess.run([sys.executable, str(VALIDAR), str(self.repo), "--pr-body", str(cuerpo)],
+                           capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(p.returncode, 1, p.stdout)
+        for parte in ("✋ Qué pasó:", "Por qué:", "Qué puedes hacer:", "Cómo destrabar:", "como-trabajar.md#creditos"):
+            self.assertIn(parte, p.stdout)
+
+
 class TestCLI(Base):
     def cli(self, *args):
         return subprocess.run([sys.executable, str(VALIDAR)] + [str(a) for a in args],
