@@ -1,5 +1,5 @@
 {
-  "description": "Muros del curso LCA425: protege main y bloquea force push y --no-verify.",
+  "description": "Muros del curso LCA425: protege main, bloquea force push y --no-verify, y exige saldo y cotización antes de generar en Higgsfield.",
   "hooks": {
     "PreToolUse": [
       {
@@ -9,6 +9,16 @@
             "type": "command",
             "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/proteger-git.sh\"",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "^mcp__.*__generate_(video|image|audio)(_batch)?$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/saldo-higgsfield.sh\"",
+            "timeout": 15
           }
         ]
       }
