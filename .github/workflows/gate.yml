@@ -6,11 +6,10 @@ on:
       estandar_ref:
         description: Tag o rama de lca425-estandar con el validador
         type: string
-        default: v1
+        default: main
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   gate:
