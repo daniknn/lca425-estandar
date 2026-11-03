@@ -1,13 +1,16 @@
 #!/bin/sh
-# Hook PreToolUse (MCP generate_video|image|audio y sus _batch): no deja gastar créditos de Higgsfield
-# sin consultar el saldo y cotizar antes. POSIX sh más awk, sin python ni jq.
+# Hook PreToolUse (herramientas MCP de Higgsfield que gastan créditos): no deja gastar créditos
+# sin consultar el saldo y, cuando la herramienta se puede cotizar, sin cotizar antes. POSIX sh más awk, sin python ni jq.
 # Cualquier duda o error interno sale con 2 (bloquea): falla cerrado.
 #
 # Regla (esquema.md, "Hook de saldo"):
-#   1. Una cotización (tool_input con get_cost true) siempre pasa: no gasta ni envía nada.
-#   2. Cualquier otra herramienta que no sea generate_* pasa.
-#   3. Una generación real pasa solo si, en el transcript de la sesión y DESPUÉS de la última
-#      generación real, hay una llamada a `balance` y una cotización (get_cost true).
+#   1. Una cotización siempre pasa: tool_input con get_cost true, o ads_studio_generate sin
+#      expected_credits (esa primera llamada solo cotiza y pide aprobación).
+#   2. Cualquier herramienta fuera de la lista GASTO pasa.
+#   3. Un gasto real pasa solo si, en el transcript y DESPUÉS del último gasto real, hay una
+#      llamada a `balance` y, si la herramienta está en COTIZABLE, también una cotización
+#      (get_cost true, ads_studio_quote o ads_studio_generate sin expected_credits).
+#      Las herramientas que no se pueden cotizar (upscale_video, execute_preset, ...) piden solo saldo.
 #   4. Si no se puede leer el transcript, bloquea.
 #
 # Formato del transcript que se asume (comprobado en transcripts reales de Claude Code, 2.1.x):
@@ -23,6 +26,9 @@
 # escrito, la llamada cuenta como generación previa y se bloquea (falla en el lado seguro).
 trap 'exit 2' EXIT
 set -u
+
+GASTO='generate_(video|image|audio|3d)(_batch)?|execute_preset|upscale_(image|video)|outpaint_image|remove_background|reframe|ads_studio_generate|ai_influencer_generate|build_ai_influencer|shorts_studio_create|scene_builder_3d_generate_(video|angles)|motion_control|dubbing|voice_change|create_voice(_from_confirmed_audio)?|apps_invoke'
+COTIZABLE='generate_(video|image|audio|3d)(_batch)?|upscale_image|outpaint_image|reframe|shorts_studio_create|ads_studio_generate'
 
 DOC="https://github.com/daniknn/lca425-estandar/blob/main/docs/como-trabajar.md#creditos"
 input=$(cat | tr '\n\r' '  ')
@@ -51,12 +57,18 @@ extraer() { # $1 clave del JSON; imprime su valor de texto sin escapes
 }
 
 nombre=$(extraer tool_name)
-case $nombre in
-  mcp__*__generate_video|mcp__*__generate_image|mcp__*__generate_audio) ;;
-  mcp__*__generate_video_batch|mcp__*__generate_image_batch|mcp__*__generate_audio_batch) ;;
-  '') ;; # no se pudo leer el nombre: se trata como generación y se exige el transcript
-  *) permitir ;;
-esac
+herr=${nombre##*__}
+necesita_cot=1
+if [ -n "$nombre" ]; then
+  case $nombre in mcp__*) ;; *) permitir ;; esac
+  printf '%s' "$herr" | grep -Eqx "$GASTO" || permitir
+  printf '%s' "$herr" | grep -Eqx "$COTIZABLE" || necesita_cot=0
+fi # sin nombre legible: se trata como gasto cotizable y se exige el transcript
+
+# ads_studio_generate sin expected_credits solo cotiza y pide aprobación: no gasta.
+if [ "$herr" = ads_studio_generate ] && ! printf '%s' "$input" | grep -q '"expected_credits"'; then
+  permitir
+fi
 
 # Cotización: get_cost true y ningún get_cost false (en un batch, una sola generación real lo anula).
 if printf '%s' "$input" | grep -Eq '"get_cost"[[:space:]]*:[[:space:]]*true' \
@@ -72,7 +84,7 @@ fi
 
 idactual=$(extraer tool_use_id)
 
-if awk -v idactual="$idactual" '
+if awk -v idactual="$idactual" -v gasto="^mcp__.*__($GASTO)$" -v necesita_cot="$necesita_cot" '
   BEGIN { bal = 0; cot = 0 }
   {
     linea = $0
@@ -88,16 +100,19 @@ if awk -v idactual="$idactual" '
       nm = substr(c, RSTART + 8, RLENGTH - 9)
       if (nm ~ /__balance$/) {
         bal = 1
-      } else if (nm ~ /__generate_(video|image|audio)(_batch)?$/) {
+      } else if (nm ~ /__ads_studio_quote$/) {
+        cot = 1
+      } else if (nm ~ gasto) {
         if (c ~ /"get_cost"[ ]*:[ ]*true/ && c !~ /"get_cost"[ ]*:[ ]*false/) cot = 1
+        else if (nm ~ /__ads_studio_generate$/ && c !~ /"expected_credits"/) cot = 1
         else { bal = 0; cot = 0 }
       }
     }
   }
-  END { exit (bal && cot) ? 0 : 1 }
+  END { exit (bal && (cot || necesita_cot == 0)) ? 0 : 1 }
 ' "$transcript"; then
   permitir
 fi
 
-bloquear "intentaste generar sin consultar tu saldo y cotizar el costo después de tu última generación." \
-         "consulta el saldo (balance), pide la cotización con get_cost true, revisa que te alcance y vuelve a pedir la generación; esto se repite antes de cada generación."
+bloquear "intentaste gastar créditos sin consultar tu saldo (y cotizar, si la herramienta lo permite) después de tu último gasto." \
+         "consulta el saldo (balance); si la herramienta acepta get_cost, pide la cotización; revisa que te alcance y vuelve a pedirlo. Se repite antes de cada gasto."

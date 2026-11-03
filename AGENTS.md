@@ -81,7 +81,7 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 - **Cómo:** Anota `presupuesto_creditos`. Antes de generar, revisa tu saldo y cotiza el costo (la receta `prompt-video` lo hace contigo) y guarda el `costo_creditos` real de cada clip en su archivo de `04_prompts/`. Si vas a pasarte, abre un issue de Permiso.
 - **Check:** El gasto real es menor o igual al tope, o hay un issue de Permiso que lo amplía.
 - **Por qué:** Los créditos son tuyos y se acaban; un clip mal pedido no se reembolsa.
-- **Lo impone:** el gate suma los `costo_creditos` de `04_prompts/` y, si pasan del tope, el PR tiene que ser de nivel Permiso; el hook de saldo del plugin bloquea generar en Higgsfield sin consultar el saldo y cotizar antes. Ver "Estado de los muros".
+- **Lo impone:** el gate suma los `costo_creditos` de `04_prompts/` y, si pasan del tope, el PR tiene que ser de nivel Permiso; el hook de saldo del plugin bloquea cualquier herramienta de Higgsfield que gaste créditos si antes no consultaste el saldo (y cotizaste, cuando la herramienta lo permite). Ver "Estado de los muros".
 
 ### 6. Declara el uso de IA y acredita lo que no hiciste
 
@@ -154,6 +154,6 @@ Detalle y ejemplos: [niveles](https://github.com/daniknn/lca425-estandar/blob/ma
 | Protección de ramas en GitHub | Que nadie suba directo a `main` | **Disuasión, no muro**: tu repo vive en tu cuenta y Daria no puede bloquear pushes. Por eso la regla 2 la imponen los hooks del plugin y el gate revisa cada PR |
 | Gate (CI, fuera de tu repo) | Brief completo, estructura del repo, sin binarios, sin secretos, sin palabras prohibidas, formato del guion, `escena` y `proposito` en cada plano, `costo_creditos` en cada prompt con clip, suma de créditos contra tu tope (pasarte exige nivel Permiso), secciones del PR (Nivel, Qué cambia, Uso de IA y, en Revisión, Reto en frío) | Activo en cada PR |
 | Hooks del plugin | Push a `main`, `--force` y `--no-verify` | Activos con el plugin instalado |
-| Hook de saldo | Que antes de cada generación en Higgsfield (video, imagen, audio) hayas consultado el saldo y cotizado el costo; si no puede comprobarlo, bloquea | Activo con el plugin instalado (desde la clase 14) |
+| Hook de saldo | Que antes de cada gasto en Higgsfield (generar video, imagen, audio o 3D, upscale, presets, reframe, voz y demás) hayas consultado el saldo, y cotizado cuando la herramienta lo permite; si no puede comprobarlo, bloquea | Activo con el plugin instalado (desde la clase 14) |
 
 Los hooks solo existen si instalaste el plugin. Quien trabaja en GitHub web tiene el gate y a Daria como muro.
